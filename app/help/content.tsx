@@ -41,19 +41,19 @@ export default function HelpContent() {
                 </button>
                 <button
                   className={`font-medium px-4 py-2 shadow transition duration-150 ease-in-out rounded-full inline-flex items-center justify-center m-1 ${
-                    category === '1' ? 'bg-teal-500 hover:bg-teal-500 dark:bg-teal-600/25 dark:hover:bg-teal-600/25' : 'bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700'
+                    category === '1' ? 'bg-orange-500 hover:bg-orange-500 dark:bg-orange-600/25 dark:hover:bg-orange-600/25' : 'bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700'
                   }`}
                   onClick={() => setCategory('1')}
                 >
                   <svg className="w-4 h-4 shrink-0 mr-2" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                     <path
-                      className={`fill-current ${category === '1' ? 'text-teal-200 dark:text-teal-400' : 'text-teal-500'}`}
+                      className={`fill-current ${category === '1' ? 'text-orange-200 dark:text-orange-400' : 'text-orange-500'}`}
                       d="M5 16H4a4 4 0 01-4-4v-1h2v1a2 2 0 002 2h1v2zM13 10h-1.686l-1.207-1.207L14.37 4.63a2.121 2.121 0 00-3-3L7.207 5.793 5.99 4.576 5.98 3.02 3.038.079 0 3.117 3 6h1.586l1.207 1.207L4 9l3 3 1.793-1.793L10 11.414V13l3.01 3.01 2.98-2.979L13 10z"
                     />
                   </svg>
                   <span
                     className={`transition duration-150 ease-in-out ${
-                      category === '1' ? 'text-white dark:text-teal-400' : 'text-gray-600 dark:text-gray-300'
+                      category === '1' ? 'text-white dark:text-orange-400' : 'text-gray-600 dark:text-gray-300'
                     }`}
                   >
                     Getting Started
@@ -130,9 +130,9 @@ export default function HelpContent() {
                   {/* Category icon */}
                   <div className="flex items-center px-4 sm:px-8">
                     <svg className="w-8 h-8" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                      <circle className="fill-current text-teal-100 dark:hidden" cx="16" cy="16" r="16" />
+                      <circle className="fill-current text-orange-100 dark:hidden" cx="16" cy="16" r="16" />
                       <path
-                        className="fill-current text-teal-500"
+                        className="fill-current text-orange-500"
                         d="M19 18.414l-4 4L9.586 17l.707-.707L12 14.586V8.414l-5-5L4.414 6l6.293 6.293-1.414 1.414L1.586 6 7 .586l7 7v5l8.463-8.463a3.828 3.828 0 115.414 5.414L21 16.414v6.172l5 5L28.586 25l-6.293-6.293 1.414-1.414L31.414 25 26 30.414l-7-7v-5zm-4 1.172L26.463 8.123a1.828 1.828 0 10-2.586-2.586L12.414 17 15 19.586zM11 30v2C4.925 32 0 27.075 0 21h2a9 9 0 009 9zm0-5v2a6 6 0 01-6-6h2a4 4 0 004 4z"
                       />
                     </svg>
@@ -148,7 +148,7 @@ export default function HelpContent() {
                       Et leo duis ut diam quam nulla porttitor porttitor lacus luctus accumsan tortor, lorem dolor sed viverra ipsum nunc aliquet
                       bibendum enim eu. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
                     </p>
-                    <a className="inline-flex items-center font-medium text-teal-500 hover:underline mt-2" href="#0">
+                    <a className="inline-flex items-center font-medium text-orange-500 hover:underline mt-2" href="#0">
                       <span>Learn more</span>
                       <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                         <path className="fill-current" d="M6.602 11l-.875-.864L9.33 6.534H0v-1.25h9.33L5.727 1.693l.875-.875 5.091 5.091z" />
@@ -198,7 +198,7 @@ export default function HelpContent() {
                       Et leo duis ut diam quam nulla porttitor porttitor lacus luctus accumsan tortor, lorem dolor sed viverra ipsum nunc aliquet
                       bibendum enim eu. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
                     </p>
-                    <a className="inline-flex items-center font-medium text-teal-500 hover:underline mt-2" href="#0">
+                    <a className="inline-flex items-center font-medium text-orange-500 hover:underline mt-2" href="#0">
                       <span>Learn more</span>
                       <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                         <path className="fill-current" d="M6.602 11l-.875-.864L9.33 6.534H0v-1.25h9.33L5.727 1.693l.875-.875 5.091 5.091z" />
@@ -258,7 +258,7 @@ export default function HelpContent() {
                       Et leo duis ut diam quam nulla porttitor porttitor lacus luctus accumsan tortor, lorem dolor sed viverra ipsum nunc aliquet
                       bibendum enim eu. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
                     </p>
-                    <a className="inline-flex items-center font-medium text-teal-500 hover:underline mt-2" href="#0">
+                    <a className="inline-flex items-center font-medium text-orange-500 hover:underline mt-2" href="#0">
                       <span>Learn more</span>
                       <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                         <path className="fill-current" d="M6.602 11l-.875-.864L9.33 6.534H0v-1.25h9.33L5.727 1.693l.875-.875 5.091 5.091z" />
@@ -308,7 +308,7 @@ export default function HelpContent() {
                       Et leo duis ut diam quam nulla porttitor porttitor lacus luctus accumsan tortor, lorem dolor sed viverra ipsum nunc aliquet
                       bibendum enim eu. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
                     </p>
-                    <a className="inline-flex items-center font-medium text-teal-500 hover:underline mt-2" href="#0">
+                    <a className="inline-flex items-center font-medium text-orange-500 hover:underline mt-2" href="#0">
                       <span>Learn more</span>
                       <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                         <path className="fill-current" d="M6.602 11l-.875-.864L9.33 6.534H0v-1.25h9.33L5.727 1.693l.875-.875 5.091 5.091z" />
@@ -340,9 +340,9 @@ export default function HelpContent() {
                   {/* Category icon */}
                   <div className="flex items-center px-4 sm:px-8">
                     <svg className="w-8 h-8" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                      <circle className="fill-current text-teal-100 dark:hidden" cx="16" cy="16" r="16" />
+                      <circle className="fill-current text-orange-100 dark:hidden" cx="16" cy="16" r="16" />
                       <path
-                        className="fill-current text-teal-500"
+                        className="fill-current text-orange-500"
                         d="M19 18.414l-4 4L9.586 17l.707-.707L12 14.586V8.414l-5-5L4.414 6l6.293 6.293-1.414 1.414L1.586 6 7 .586l7 7v5l8.463-8.463a3.828 3.828 0 115.414 5.414L21 16.414v6.172l5 5L28.586 25l-6.293-6.293 1.414-1.414L31.414 25 26 30.414l-7-7v-5zm-4 1.172L26.463 8.123a1.828 1.828 0 10-2.586-2.586L12.414 17 15 19.586zM11 30v2C4.925 32 0 27.075 0 21h2a9 9 0 009 9zm0-5v2a6 6 0 01-6-6h2a4 4 0 004 4z"
                       />
                     </svg>
@@ -358,7 +358,7 @@ export default function HelpContent() {
                       Et leo duis ut diam quam nulla porttitor porttitor lacus luctus accumsan tortor, lorem dolor sed viverra ipsum nunc aliquet
                       bibendum enim eu. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia.
                     </p>
-                    <a className="inline-flex items-center font-medium text-teal-500 hover:underline mt-2" href="#0">
+                    <a className="inline-flex items-center font-medium text-orange-500 hover:underline mt-2" href="#0">
                       <span>Learn more</span>
                       <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                         <path className="fill-current" d="M6.602 11l-.875-.864L9.33 6.534H0v-1.25h9.33L5.727 1.693l.875-.875 5.091 5.091z" />
@@ -439,7 +439,7 @@ export default function HelpContent() {
               </span>
               <ul className="flex">
                 <li className="mx-1">
-                  <a className="inline-flex text-teal-500 px-1 border-b border-teal-500 transition duration-150 ease-in-out" href="#0">
+                  <a className="inline-flex text-orange-500 px-1 border-b border-orange-500 transition duration-150 ease-in-out" href="#0">
                     1
                   </a>
                 </li>
@@ -489,7 +489,7 @@ export default function HelpContent() {
                   </a>
                 </li>
               </ul>
-              <a className="hidden sm:inline-flex items-center font-medium text-teal-500 hover:underline" href="#0">
+              <a className="hidden sm:inline-flex items-center font-medium text-orange-500 hover:underline" href="#0">
                 <span>Next</span>
                 <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                   <path className="fill-current" d="M6.602 11l-.875-.864L9.33 6.534H0v-1.25h9.33L5.727 1.693l.875-.875 5.091 5.091z" />

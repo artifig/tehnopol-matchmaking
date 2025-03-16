@@ -20,7 +20,7 @@ export default function RelatedPosts02() {
               <article className="relative group p-6 text-white" data-aos="fade-down" data-aos-anchor="[data-aos-id-relposts]">
                 <figure>
                   <Image className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-75 transition duration-700 ease-out" src={RelatedImage01} alt="Related post 01" />
-                  <div className="absolute inset-0 bg-teal-500 opacity-75 group-hover:opacity-50 transition duration-700 ease-out" aria-hidden="true"></div>
+                  <div className="absolute inset-0 bg-orange-500 opacity-75 group-hover:opacity-50 transition duration-700 ease-out" aria-hidden="true"></div>
                 </figure>
                 <div className="relative flex flex-col h-full">
                   <header className="grow">

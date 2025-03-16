@@ -16,7 +16,7 @@ export default function RelatedPosts01() {
             <article className="relative group px-6 py-4 sm:py-8" data-aos="fade-up" data-aos-anchor="[data-aos-id-featposts]" data-aos-delay="100">
               <figure>
                 <Image className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-75 transition duration-700 ease-out" src={RelatedImage03} alt="Related post 03" />
-                <div className="absolute inset-0 bg-teal-500 opacity-75 group-hover:opacity-50 transition duration-700 ease-out" aria-hidden="true"></div>
+                <div className="absolute inset-0 bg-orange-500 opacity-75 group-hover:opacity-50 transition duration-700 ease-out" aria-hidden="true"></div>
               </figure>
               <div className="relative flex flex-col h-full text-white">
                 <header className="grow">

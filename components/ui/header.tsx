@@ -51,7 +51,7 @@ export default function Header() {
                 <li>
                   <Link
                     href="/help"
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-500 dark:hover:text-teal-500 flex py-2 px-4 leading-tight"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500 dark:hover:text-orange-500 flex py-2 px-4 leading-tight"
                   >
                     Help center
                   </Link>
@@ -59,7 +59,7 @@ export default function Header() {
                 <li>
                   <Link
                     href="/404"
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-teal-500 dark:hover:text-teal-500 flex py-2 px-4 leading-tight"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-500 dark:hover:text-orange-500 flex py-2 px-4 leading-tight"
                   >
                     404
                   </Link>
@@ -73,7 +73,7 @@ export default function Header() {
             {/* Desktop CTA on the right */}
             <ul className="flex justify-end flex-wrap items-center">
               <li>
-                <Link href="/contact" className="btn-sm text-white bg-teal-500 hover:bg-teal-400 ml-6">
+                <Link href="/contact" className="btn-sm text-white bg-orange-500 hover:bg-orange-400 ml-6">
                   Request code
                 </Link>
               </li>

@@ -40,11 +40,11 @@ export default function Process() {
             {/* 1st item */}
             <div className="relative flex flex-col items-center">
               {/* Line connecting (1) and (2) */}
-              <div aria-hidden="true" className="absolute h-px opacity-50 bg-linear-to-r from-white via-teal-400 to-white dark:from-gray-900 dark:via-teal-400 dark:to-gray-900 hidden md:block" style={{ width: 'calc(100% - 48px)', left: 'calc(50% + 48px)', top: '24px' }}>
+              <div aria-hidden="true" className="absolute h-px opacity-50 bg-linear-to-r from-white via-orange-400 to-white dark:from-gray-900 dark:via-orange-400 dark:to-gray-900 hidden md:block" style={{ width: 'calc(100% - 48px)', left: 'calc(50% + 48px)', top: '24px' }}>
                 <div className="absolute inset-0 border-t border-dashed border-white dark:border-gray-900"></div>
               </div>
               {/* Number */}
-              <div className="w-12 h-12 rounded-full bg-teal-400 dark:bg-teal-600/25 flex justify-center items-center text-white dark:text-teal-400 font-medium mb-8 lg:mb-12">1</div>
+              <div className="w-12 h-12 rounded-full bg-orange-400 dark:bg-orange-600/25 flex justify-center items-center text-white dark:text-orange-400 font-medium mb-8 lg:mb-12">1</div>
               {/* Mobile mockup */}
               <div className="inline-flex relative justify-center items-center">
                 {/* Image inside mockup size: 290x624px (or 580x1248px for Retina devices) */}
@@ -57,11 +57,11 @@ export default function Process() {
             {/* 2nd item */}
             <div className="relative flex flex-col items-center">
               {/* Line connecting (2) and (3) */}
-              <div aria-hidden="true" className="absolute h-px opacity-50 bg-linear-to-r from-white via-teal-400 to-white dark:from-gray-900 dark:via-teal-400 dark:to-gray-900 hidden md:block" style={{ width: 'calc(100% - 48px)', left: 'calc(50% + 48px)', top: '24px' }}>
+              <div aria-hidden="true" className="absolute h-px opacity-50 bg-linear-to-r from-white via-orange-400 to-white dark:from-gray-900 dark:via-orange-400 dark:to-gray-900 hidden md:block" style={{ width: 'calc(100% - 48px)', left: 'calc(50% + 48px)', top: '24px' }}>
                 <div className="absolute inset-0 border-t border-dashed border-white dark:border-gray-900"></div>
               </div>
               {/* Number */}
-              <div className="w-12 h-12 rounded-full bg-teal-400 dark:bg-teal-600/25 flex justify-center items-center text-white dark:text-teal-400 font-medium mb-8 lg:mb-12">2</div>
+              <div className="w-12 h-12 rounded-full bg-orange-400 dark:bg-orange-600/25 flex justify-center items-center text-white dark:text-orange-400 font-medium mb-8 lg:mb-12">2</div>
               {/* Mobile mockup */}
               <div className="inline-flex relative justify-center items-center">
                 {/* Image inside mockup size: 290x624px (or 580x1248px for Retina devices) */}
@@ -73,7 +73,7 @@ export default function Process() {
 
             {/* 3rd item */}
             <div className="relative flex flex-col items-center">
-              <div className="w-12 h-12 rounded-full bg-teal-400 dark:bg-teal-600/25 flex justify-center items-center text-white dark:text-teal-400 font-medium mb-8 lg:mb-12">3</div>
+              <div className="w-12 h-12 rounded-full bg-orange-400 dark:bg-orange-600/25 flex justify-center items-center text-white dark:text-orange-400 font-medium mb-8 lg:mb-12">3</div>
               {/* Mobile mockup */}
               <div className="inline-flex relative justify-center items-center">
                 {/* Image inside mockup size: 290x624px (or 580x1248px for Retina devices) */}

@@ -95,7 +95,7 @@ export default function TestimonialsCarousel() {
                     <div className="font-medium text-lg">
                       <cite className="not-italic text-gray-800 dark:text-gray-100">{item.name}</cite>
                       <span className="text-gray-200 dark:text-gray-700"> - </span>
-                      <span className="text-gray-500 dark:text-gray-400">{item.role}</span> <a className="text-teal-500 hover:underline" href={item.link}>{item.team}</a>
+                      <span className="text-gray-500 dark:text-gray-400">{item.role}</span> <a className="text-orange-500 hover:underline" href={item.link}>{item.team}</a>
                     </div>
 
                   </Transition>
@@ -109,20 +109,20 @@ export default function TestimonialsCarousel() {
               {/* Arrows */}
               <div className="absolute inset-0 flex items-center justify-between">
                 <button
-                  className="relative z-20 w-12 h-12 p-1 box-content flex items-center justify-center group transform -translate-x-2 md:-translate-x-1/2 bg-teal-500 hover:bg-teal-400 dark:bg-gray-800 dark:hover:bg-teal-500/25 transition duration-150 ease-in-out"
+                  className="relative z-20 w-12 h-12 p-1 box-content flex items-center justify-center group transform -translate-x-2 md:-translate-x-1/2 bg-orange-500 hover:bg-orange-400 dark:bg-gray-800 dark:hover:bg-orange-500/25 transition duration-150 ease-in-out"
                   onClick={() => { setActive(active === 0 ? items.length - 1 : active - 1); setAutorotate(false); }}
                 >
                   <span className="sr-only">Previous</span>
-                  <svg className="w-4 h-4 fill-current text-white dark:text-gray-400 group-hover:text-white dark:group-hover:text-teal-500 transition duration-150 ease-in-out" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                  <svg className="w-4 h-4 fill-current text-white dark:text-gray-400 group-hover:text-white dark:group-hover:text-orange-500 transition duration-150 ease-in-out" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6.7 14.7l1.4-1.4L3.8 9H16V7H3.8l4.3-4.3-1.4-1.4L0 8z" />
                   </svg>
                 </button>
                 <button
-                  className="relative z-20 w-12 h-12 p-1 box-content flex items-center justify-center group transform translate-x-2 md:translate-x-1/2 bg-teal-500 hover:bg-teal-400 dark:bg-gray-800 dark:hover:bg-teal-500/25 transition duration-150 ease-in-out"
+                  className="relative z-20 w-12 h-12 p-1 box-content flex items-center justify-center group transform translate-x-2 md:translate-x-1/2 bg-orange-500 hover:bg-orange-400 dark:bg-gray-800 dark:hover:bg-orange-500/25 transition duration-150 ease-in-out"
                   onClick={() => { setActive(active === items.length - 1 ? 0 : active + 1); setAutorotate(false); }}
                 >
                   <span className="sr-only">Next</span>
-                  <svg className="w-4 h-4 fill-current text-white dark:text-gray-400 group-hover:text-white dark:group-hover:text-teal-500 transition duration-150 ease-in-out" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                  <svg className="w-4 h-4 fill-current text-white dark:text-gray-400 group-hover:text-white dark:group-hover:text-orange-500 transition duration-150 ease-in-out" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                     <path d="M9.3 14.7l-1.4-1.4L12.2 9H0V7h12.2L7.9 2.7l1.4-1.4L16 8z" />
                   </svg>
                 </button>

@@ -102,7 +102,7 @@ export default function Career() {
               <h3 className="text-lg font-bold tracking-tight text-center lg:text-left mb-4">Locations</h3>
               <ul className="flex flex-wrap justify-center lg:flex-col lg:justify-start font-medium -mx-3 -my-1 lg:mx-0">
                 <li className="px-3 py-1 lg:px-0">
-                  <a className="flex items-center text-teal-500" href="#0">
+                  <a className="flex items-center text-orange-500" href="#0">
                     <svg className="w-4 h-4 shrink-0 fill-current text-gray-400 dark:text-gray-500 mr-3" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                       <path d="M7.3 8.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0zM7.3 14.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0zM.3 9.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0z" />
                     </svg>
@@ -110,7 +110,7 @@ export default function Career() {
                   </a>
                 </li>
                 <li className="px-3 py-1 lg:px-0">
-                  <a className="flex items-center text-gray-600 dark:text-gray-400 hover:text-teal-500" href="#0">
+                  <a className="flex items-center text-gray-600 dark:text-gray-400 hover:text-orange-500" href="#0">
                     <svg className="w-4 h-4 shrink-0 fill-current text-gray-400 dark:text-gray-500 mr-3" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                       <path d="M7.3 8.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0zM7.3 14.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0zM.3 9.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0z" />
                     </svg>
@@ -118,7 +118,7 @@ export default function Career() {
                   </a>
                 </li>
                 <li className="px-3 py-1 lg:px-0">
-                  <a className="flex items-center text-gray-600 dark:text-gray-400 hover:text-teal-500" href="#0">
+                  <a className="flex items-center text-gray-600 dark:text-gray-400 hover:text-orange-500" href="#0">
                     <svg className="w-4 h-4 shrink-0 fill-current text-gray-400 dark:text-gray-500 mr-3" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                       <path d="M7.3 8.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0zM7.3 14.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0zM.3 9.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0z" />
                     </svg>
@@ -126,7 +126,7 @@ export default function Career() {
                   </a>
                 </li>
                 <li className="px-3 py-1 lg:px-0">
-                  <a className="flex items-center text-gray-600 dark:text-gray-400 hover:text-teal-500" href="#0">
+                  <a className="flex items-center text-gray-600 dark:text-gray-400 hover:text-orange-500" href="#0">
                     <svg className="w-4 h-4 shrink-0 fill-current text-gray-400 dark:text-gray-500 mr-3" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                       <path d="M7.3 8.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0zM7.3 14.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0zM.3 9.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0z" />
                     </svg>
@@ -134,7 +134,7 @@ export default function Career() {
                   </a>
                 </li>
                 <li className="px-3 py-1 lg:px-0">
-                  <a className="flex items-center text-gray-600 dark:text-gray-400 hover:text-teal-500" href="#0">
+                  <a className="flex items-center text-gray-600 dark:text-gray-400 hover:text-orange-500" href="#0">
                     <svg className="w-4 h-4 shrink-0 fill-current text-gray-400 dark:text-gray-500 mr-3" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                       <path d="M7.3 8.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0zM7.3 14.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0zM.3 9.7c-.4-.4-.4-1 0-1.4l7-7c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-7 7c-.4.4-1 .4-1.4 0z" />
                     </svg>

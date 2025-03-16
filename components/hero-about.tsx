@@ -21,7 +21,7 @@ export default function HeroAbout() {
                 <div className="absolute inset-0 bg-linear-to-t from-white dark:from-gray-900" aria-hidden="true"></div>
               </div>
               <div className="absolute" data-aos="fade-down">
-                <h1 className="h1 lg:text-6xl font-red-hat-display">Make your own <span className="text-teal-500">way</span></h1>
+                <h1 className="h1 lg:text-6xl font-red-hat-display">Make your own <span className="text-orange-500">way</span></h1>
               </div>
               <div className="absolute bottom-0 -mb-8 w-0.5 h-16 bg-gray-300 dark:bg-gray-700" aria-hidden="true"></div>
             </div>

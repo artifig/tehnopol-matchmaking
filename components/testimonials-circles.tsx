@@ -47,7 +47,7 @@ export default function TestimonialsCircles() {
       image: UserImage3,
       size: 72,
       style: { maxWidth: '10.62%', top: '43%', left: '13%' },
-      comment: 'When, while the lovely valley teems with vapour around me, and the meridian sun strikes the upper surface of the impenetrable foliage of my trees, and but a few stray gleams steal into the inner sanctuary, I throw myself down among the tall grass by the trickling stream.',
+      comment: 'When, while the lovely valley teems with vapour around me, and the meridian sun strikes the upper surface of the impenetrable foliage of my trees, and but a few stray gleams sorange into the inner sanctuary, I throw myself down among the tall grass by the trickling stream.',
       name: 'Leonel Roy',
     },
     {

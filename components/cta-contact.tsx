@@ -34,7 +34,7 @@ export default function CtaContact() {
 
             {/* CTA button */}
             <div className="flex justify-center mt-8">
-              <a className="btn text-white bg-teal-500 hover:bg-teal-400" href="#0">Send us a message</a>
+              <a className="btn text-white bg-orange-500 hover:bg-orange-400" href="#0">Send us a message</a>
             </div>
 
           </div>

@@ -177,7 +177,7 @@ export default function Footer() {
             <ul className="flex mb-4 md:order-2 md:ml-4 md:mb-0">
               <li>
                 <a
-                  className="flex justify-center items-center text-white bg-teal-500 dark:text-teal-500 dark:bg-gray-800 hover:underline hover:bg-teal-600 rounded-full transition duration-150 ease-in-out"
+                  className="flex justify-center items-center text-white bg-orange-500 dark:text-orange-500 dark:bg-gray-800 hover:underline hover:bg-orange-600 rounded-full transition duration-150 ease-in-out"
                   href="#0"
                   aria-label="Twitter"
                 >
@@ -188,7 +188,7 @@ export default function Footer() {
               </li>
               <li className="ml-4">
                 <a
-                  className="flex justify-center items-center text-white bg-teal-500 dark:text-teal-500 dark:bg-gray-800 hover:underline hover:bg-teal-600 rounded-full transition duration-150 ease-in-out"
+                  className="flex justify-center items-center text-white bg-orange-500 dark:text-orange-500 dark:bg-gray-800 hover:underline hover:bg-orange-600 rounded-full transition duration-150 ease-in-out"
                   href="#0"
                   aria-label="Github"
                 >
@@ -199,7 +199,7 @@ export default function Footer() {
               </li>
               <li className="ml-4">
                 <a
-                  className="flex justify-center items-center text-white bg-teal-500 dark:text-teal-500 dark:bg-gray-800 hover:underline hover:bg-teal-600 rounded-full transition duration-150 ease-in-out"
+                  className="flex justify-center items-center text-white bg-orange-500 dark:text-orange-500 dark:bg-gray-800 hover:underline hover:bg-orange-600 rounded-full transition duration-150 ease-in-out"
                   href="#0"
                   aria-label="Facebook"
                 >
@@ -210,7 +210,7 @@ export default function Footer() {
               </li>
               <li className="ml-4">
                 <a
-                  className="flex justify-center items-center text-white bg-teal-500 dark:text-teal-500 dark:bg-gray-800 hover:underline hover:bg-teal-600 rounded-full transition duration-150 ease-in-out"
+                  className="flex justify-center items-center text-white bg-orange-500 dark:text-orange-500 dark:bg-gray-800 hover:underline hover:bg-orange-600 rounded-full transition duration-150 ease-in-out"
                   href="#0"
                   aria-label="Instagram"
                 >
@@ -223,7 +223,7 @@ export default function Footer() {
               </li>
               <li className="ml-4">
                 <a
-                  className="flex justify-center items-center text-white bg-teal-500 dark:text-teal-500 dark:bg-gray-800 hover:underline hover:bg-teal-600 rounded-full transition duration-150 ease-in-out"
+                  className="flex justify-center items-center text-white bg-orange-500 dark:text-orange-500 dark:bg-gray-800 hover:underline hover:bg-orange-600 rounded-full transition duration-150 ease-in-out"
                   href="#0"
                   aria-label="Linkedin"
                 >

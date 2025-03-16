@@ -23,7 +23,7 @@ export default function TestimonialsBlocks() {
               </div>
               <blockquote className="text-xl text-gray-600 dark:text-gray-400">“ This is a great app and the value is amazing. Since I purchased it I have been using it everyday! Highly recommend it. “</blockquote>
               <div className="font-red-hat-display font-bold mt-2">
-                <cite className="not-italic">—Andy Croll</cite>, <a className="text-teal-500 transition duration-150 ease-in-out" href="#0">Appy.com</a>
+                <cite className="not-italic">—Andy Croll</cite>, <a className="text-orange-500 transition duration-150 ease-in-out" href="#0">Appy.com</a>
               </div>
             </div>
 
@@ -37,7 +37,7 @@ export default function TestimonialsBlocks() {
               </div>
               <blockquote className="text-xl text-gray-600 dark:text-gray-400">“ This is a great app and the value is amazing. Since I purchased it I have been using it everyday! Highly recommend it. “</blockquote>
               <div className="font-red-hat-display font-bold mt-2">
-                <cite className="not-italic">—Patricia Lepisov</cite>, <a className="text-teal-500 transition duration-150 ease-in-out" href="#0">Nobi Bank</a>
+                <cite className="not-italic">—Patricia Lepisov</cite>, <a className="text-orange-500 transition duration-150 ease-in-out" href="#0">Nobi Bank</a>
               </div>
             </div>
 
@@ -51,7 +51,7 @@ export default function TestimonialsBlocks() {
               </div>
               <blockquote className="text-xl text-gray-600 dark:text-gray-400">“ This is a great app and the value is amazing. Since I purchased it I have been using it everyday! Highly recommend it. “</blockquote>
               <div className="font-red-hat-display font-bold mt-2">
-                <cite className="not-italic">—Zhenya Ritz</cite>, <a className="text-teal-500 transition duration-150 ease-in-out" href="#0">Sync</a>
+                <cite className="not-italic">—Zhenya Ritz</cite>, <a className="text-orange-500 transition duration-150 ease-in-out" href="#0">Sync</a>
               </div>
             </div>
 
@@ -65,7 +65,7 @@ export default function TestimonialsBlocks() {
               </div>
               <blockquote className="text-xl text-gray-600 dark:text-gray-400">“ This is a great app and the value is amazing. Since I purchased it I have been using it everyday! Highly recommend it. “</blockquote>
               <div className="font-red-hat-display font-bold mt-2">
-                <cite className="not-italic">—Lisa Champ</cite>, <a className="text-teal-500 transition duration-150 ease-in-out" href="#0">Appicu</a>
+                <cite className="not-italic">—Lisa Champ</cite>, <a className="text-orange-500 transition duration-150 ease-in-out" href="#0">Appicu</a>
               </div>
             </div>
 
