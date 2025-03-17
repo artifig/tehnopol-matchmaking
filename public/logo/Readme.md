@@ -1,0 +1,1 @@
+This is for posterity. Actual implementation through components/ui/logo.tsx
