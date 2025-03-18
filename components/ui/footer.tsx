@@ -36,7 +36,7 @@ export default function Footer() {
             {/* 1st block */}
             <div className="md:col-span-2 lg:col-span-3">
               {/* Logo */}
-              <Link className="inline-block" href="/" aria-label="Cruip">
+              <Link className="inline-block" href="/" aria-label="Tehnopol">
                 <svg className="w-8 h-8" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                   <defs>
                     <linearGradient x1="26%" y1="100%" x2="100%" y2="100%" id="flogo_a">
@@ -246,7 +246,7 @@ export default function Footer() {
             </div>
 
             {/* Copyrights note */}
-            <div className="text-gray-600 dark:text-gray-400 text-sm mr-4">&copy; Cruip.com. All rights reserved.</div>
+            <div className="text-gray-600 dark:text-gray-400 text-sm mr-4">&copy; Tehnopol. All rights reserved.</div>
           </div>
         </div>
       </div>
