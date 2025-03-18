@@ -73,8 +73,8 @@ export default function Header() {
             {/* Desktop CTA on the right */}
             <ul className="flex justify-end flex-wrap items-center">
               <li>
-                <Link href="/contact" className="btn-sm text-white bg-orange-500 hover:bg-orange-400 ml-6">
-                  Start matchmaking
+                <Link href="/assessment" className="btn-sm text-white bg-orange-500 hover:bg-orange-400 ml-6">
+                  Start Matchmaking
                 </Link>
               </li>
             </ul>

@@ -35,9 +35,9 @@ export default function Cta() {
 
             {/* CTA form */}
             <form className="w-full lg:w-1/2">
-              <form className="flex flex-col sm:flex-row justify-center max-w-xs mx-auto sm:max-w-md lg:max-w-none" method="get" action="/contact">
-              <input type="text" name="goals" className="form-input w-full mb-2 sm:mb-0 sm:mr-2" placeholder="Business goals" aria-label="Business goals" />
-              <button type="submit" className="btn text-white bg-orange-500 hover:bg-orange-400 shrink-0">Start matchmaking</button>
+              <form className="flex flex-col sm:flex-row justify-center max-w-xs mx-auto sm:max-w-md lg:max-w-none" method="get" action="/assessment">
+              <input type="text" name="goals" className="form-input w-full mb-2 sm:mb-0 sm:mr-2" placeholder="Enter your business goals..." aria-label="Business goals" />
+              <button type="submit" className="btn text-white bg-orange-500 hover:bg-orange-400 shrink-0">Start Matchmaking</button>
               </form>
               {/* Success message */}
               {/* <p className="text-center lg:text-left lg:absolute mt-2 opacity-75 text-sm">Thanks for subscribing!</p> */}

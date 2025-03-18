@@ -15,10 +15,10 @@ export default function HeroHome() {
               <h1 className="h1 lg:text-6xl mb-4 font-red-hat-display font-black" data-aos="fade-down">Your potential, unlocked</h1>
               <p className="text-xl text-gray-600 dark:text-gray-400" data-aos="fade-down" data-aos-delay="150">Our matchmaking platform connects you with the right people to achieve your goals.</p>
               {/* CTA form */}
-              <form className="mt-8" data-aos="fade-down" data-aos-delay="300" method="get" action="/contact">
+              <form className="mt-8" data-aos="fade-down" data-aos-delay="300" method="get" action="/assessment">
                 <div className="flex flex-col sm:flex-row justify-center max-w-sm mx-auto sm:max-w-md md:mx-0">
-                  <input type="text" name="goals" className="form-input w-full mb-2 sm:mb-0 sm:mr-2" placeholder="Business goals" aria-label="Business goals" />
-                  <button type="submit" className="btn text-white bg-orange-500 hover:bg-orange-400 shrink-0">Start matchmaking</button>
+                  <input type="text" name="goals" className="form-input w-full mb-2 sm:mb-0 sm:mr-2" placeholder="Enter your business goals..." aria-label="Business goals" />
+                  <button type="submit" className="btn text-white bg-orange-500 hover:bg-orange-400 shrink-0">Start Matchmaking</button>
                 </div>
               </form>
               <ul className="max-w-sm sm:max-w-md mx-auto md:max-w-none text-gray-600 dark:text-gray-400 mt-8 -mb-2" data-aos="fade-down" data-aos-delay="450">
