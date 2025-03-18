@@ -198,13 +198,13 @@ function MetricItem({ title, value }: { title: string; value: number }) {
 
 function SolutionCard({ name, logo, onLearnMore }: { name: string; logo: string; onLearnMore: () => void; }) {
   return (
-    <div className="bg-gray-200 dark:bg-gray-700 rounded-lg p-4 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300">
+    <div className="p-4 border-b border-gray-200 dark:border-gray-700 last:border-0">
       <div className="flex items-center gap-4">
-        <div className="w-14 h-14 flex-shrink-0 bg-white dark:bg-gray-800 rounded-lg p-2">
+        <div className="w-14 h-14 flex-shrink-0 bg-gray-100 dark:bg-gray-400 rounded-lg p-2">
           <img 
             src={logo} 
             alt={`${name} logo`} 
-            className={`w-full h-full object-contain ${logo.includes('AIRE') ? 'dark:invert-0 invert' : ''}`}
+            className={`w-full h-full object-contain ${logo.includes('AIRE') ? 'invert' : ''}`}
           />
         </div>
         <div className="flex-1 min-w-0">
