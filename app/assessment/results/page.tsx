@@ -196,21 +196,21 @@ function MetricItem({ title, value }: { title: string; value: number }) {
 function SolutionCard({ name, logo, onLearnMore }: { name: string; logo: string; onLearnMore: () => void; }) {
   return (
     <div className="bg-gray-200 dark:bg-gray-700 rounded-md p-4 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300">
-      <div className="flex items-center space-x-4 mb-4">
-        <div className="w-16 h-16 flex-shrink-0 bg-white dark:bg-gray-800 rounded-md p-2">
+      <div className="flex items-center gap-4">
+        <div className="w-14 h-14 flex-shrink-0 bg-white dark:bg-gray-800 rounded-md p-2">
           <img 
             src={logo} 
             alt={`${name} logo`} 
             className={`w-full h-full object-contain ${logo.includes('AIRE') ? 'dark:invert-0 invert' : ''}`}
           />
         </div>
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">{name}</h3>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 truncate pr-2">{name}</h3>
         </div>
         <button
           onClick={onLearnMore}
           type="button"
-          className="btn bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 flex items-center justify-center"
+          className="flex-shrink-0 btn bg-orange-500 text-white px-3 py-1.5 rounded-md hover:bg-orange-600 flex items-center justify-center text-sm"
         >
           <span>Learn More</span>
           <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
