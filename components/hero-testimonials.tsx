@@ -15,9 +15,9 @@ export default function HeroTestimonials() {
       <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         <div className="pt-32 pb-12 md:pt-40 md:pb-20">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="h1 font-red-hat-display mb-4" data-aos="fade-down">Smart teams trust Appy to build killer websites</h1>
+            <h1 className="h1 font-red-hat-display mb-4" data-aos="fade-down">Smart teams trust Tehnopol Matchmaking to build killer businesses</h1>
             <p className="text-xl text-gray-600 dark:text-gray-400" data-aos="fade-down" data-aos-delay="150">Our customers are building some of the world's most original, useful and
-              loved products.</p>
+              loved products and services.</p>
             <div className="mt-8" data-aos="fade-down" data-aos-delay="300">
               <Link className="btn text-white bg-orange-500 hover:bg-orange-400 ml-3" href="/contact">Start matchmaking</Link>
             </div>

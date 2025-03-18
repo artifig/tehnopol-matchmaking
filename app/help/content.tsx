@@ -301,7 +301,7 @@ export default function HelpContent() {
                   <div className="pl-6">
                     <header>
                       <h3 className="font-red-hat-display text-xl font-black tracking-tighter mb-1">
-                        <a href="#0">Connect a custom domain on Appy</a>
+                        <a href="#0">Connect a custom domain on Tehnopol Matchmaking</a>
                       </h3>
                     </header>
                     <p className="text-gray-600 dark:text-gray-400">

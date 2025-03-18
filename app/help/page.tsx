@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Help - Appy',
+  title: 'Help - Tehnopol Matchmaking',
   description: 'Page description',
 }
 

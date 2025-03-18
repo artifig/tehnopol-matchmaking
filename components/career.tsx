@@ -17,7 +17,7 @@ export default function Career() {
 
           {/* Section header */}
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-20">
-            <h2 className="h2 font-red-hat-display mb-4">Explore roles at Appy's offices around the world</h2>
+            <h2 className="h2 font-red-hat-display mb-4">Explore roles at Tehnopol's offices around the world</h2>
             <p className="text-xl text-gray-600 dark:text-gray-400">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
               deserunt mollit anim id est.</p>
           </div>

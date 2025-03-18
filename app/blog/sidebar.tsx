@@ -37,7 +37,7 @@ export default function Sidebar() {
             <article>
               <a className="hover:underline" href="/#0">
                 <h3 className="font-red-hat-display font-bold tracking-tight mb-1">
-                  Don’t miss Appy’s exclusive workshop with our CEO
+                  Don’t miss Tehnopol’s exclusive workshop with our CEO
                 </h3>
               </a>
               <div className="text-sm text-gray-500">

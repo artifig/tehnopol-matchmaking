@@ -7,7 +7,7 @@ import PostItem from '@/components/post-item'
 import Sidebar from './sidebar'
 
 export const metadata = {
-  title: 'Blog - Appy',
+  title: 'Blog - Tehnopol Matchmaking',
   description: 'Page description',
 }
 

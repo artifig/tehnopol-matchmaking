@@ -55,7 +55,7 @@ export default function Timeline() {
                   <article className="p-6 bg-white dark:bg-gray-800 shadow-2xl flex flex-col">
                     <header>
                       <h3 className="h4 font-red-hat-display mb-1">
-                        <a href="#0">Launched Appy Business</a>
+                        <a href="#0">Launched Tehnopol Matchmaking Tool</a>
                       </h3>
                     </header>
                     <div className="text-gray-600 dark:text-gray-400 grow">
@@ -179,7 +179,7 @@ export default function Timeline() {
                   <article className="p-6 bg-white dark:bg-gray-800 shadow-2xl flex flex-col">
                     <header>
                       <h3 className="h4 font-red-hat-display mb-1">
-                        <a href="#0">Launched Appy Business</a>
+                        <a href="#0">Launched Tehnopol Matchmaking</a>
                       </h3>
                     </header>
                     <div className="text-gray-600 dark:text-gray-400 grow">

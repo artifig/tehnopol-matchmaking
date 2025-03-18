@@ -19,7 +19,7 @@ export default function TestimonialsCarousel() {
 
   const items: Item[] = [
     {
-      quote: '“ When we first met Appy, we were skeptical. We tried lots of things before and none of them worked. But, when we tested the Shape Builder it just perfect for our needs. “',
+      quote: '“ When we first met Tehnopol Matchmaking, we were skeptical. We tried lots of things before and none of them worked. But, when we tested the assessment tool, it was just perfect for our needs. “',
       name: 'Alexandre Park',
       role: 'Design Manager at',
       team: 'Twitter',
@@ -33,7 +33,7 @@ export default function TestimonialsCarousel() {
       link: '#0'
     },
     {
-      quote: '“ I feel grateful that Simple pushed me to expand my horizons and strive to accomplish more. When we first met Appy, we were skeptical for no reason.“',
+      quote: '“ I feel grateful that Tehnopol pushed me to expand my horizons and strive to accomplish more. When we first met Tehnopol Matchmaking, we were skeptical for no reason.“',
       name: 'Dominik Prasad',
       role: 'Backend Lead at',
       team: 'Google',
