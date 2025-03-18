@@ -73,9 +73,12 @@ export default function ResultsPage() {
             <MetricItem title="Overall Score" value={80} />
             <button 
               onClick={() => setIsMetricsModalOpen(true)} 
-              className="btn w-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 px-6 py-3 rounded-md mt-4"
+              className="btn text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 w-full flex items-center justify-center"
             >
-              View Detailed Metrics
+              <span>View Detailed Metrics</span>
+              <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                <path className="fill-current" d="M6.602 11l-.875-.864L9.33 6.534H0v-1.25h9.33L5.727 1.693l.875-.875 5.091 5.091z" />
+              </svg>
             </button>
           </div>
 
@@ -101,7 +104,7 @@ export default function ResultsPage() {
             <button
               onClick={handleDownload}
               type="button"
-              className="btn bg-orange-500 text-white px-6 py-3 rounded-md hover:bg-orange-600 w-full sm:w-auto flex items-center justify-center"
+              className="btn text-white bg-orange-500 hover:bg-orange-400 w-full sm:w-auto flex items-center justify-center px-6 py-3"
             >
               <span>Download Report</span>
               <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
@@ -111,7 +114,7 @@ export default function ResultsPage() {
             <button
               onClick={handleSendEmail}
               type="button"
-              className="btn bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 px-6 py-3 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 w-full sm:w-auto flex items-center justify-center"
+              className="btn text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 w-full sm:w-auto flex items-center justify-center px-6 py-3"
             >
               <span>Email Report</span>
               <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
@@ -195,9 +198,9 @@ function MetricItem({ title, value }: { title: string; value: number }) {
 
 function SolutionCard({ name, logo, onLearnMore }: { name: string; logo: string; onLearnMore: () => void; }) {
   return (
-    <div className="bg-gray-200 dark:bg-gray-700 rounded-md p-4 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300">
+    <div className="bg-gray-200 dark:bg-gray-700 rounded-lg p-4 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300">
       <div className="flex items-center gap-4">
-        <div className="w-14 h-14 flex-shrink-0 bg-white dark:bg-gray-800 rounded-md p-2">
+        <div className="w-14 h-14 flex-shrink-0 bg-white dark:bg-gray-800 rounded-lg p-2">
           <img 
             src={logo} 
             alt={`${name} logo`} 
@@ -210,7 +213,7 @@ function SolutionCard({ name, logo, onLearnMore }: { name: string; logo: string;
         <button
           onClick={onLearnMore}
           type="button"
-          className="flex-shrink-0 btn bg-orange-500 text-white px-3 py-1.5 rounded-md hover:bg-orange-600 flex items-center justify-center text-sm"
+          className="btn text-white bg-orange-500 hover:bg-orange-400 flex items-center justify-center px-4 py-2 text-sm"
         >
           <span>Learn More</span>
           <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">

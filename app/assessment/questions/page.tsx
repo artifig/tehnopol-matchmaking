@@ -122,7 +122,7 @@ export default function AssessmentQuestions() {
             {/* Mobile Dropdown Navigation */}
             <div className="block sm:hidden mb-4">
               <select
-                className="btn w-full py-2 px-4 rounded-md text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 focus:outline-none"
+                className="btn text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 w-full flex items-center focus:outline-none"
                 value={currentQuestion.category}
                 onChange={(e) => {
                   const selected = e.target.value;
@@ -153,10 +153,10 @@ export default function AssessmentQuestions() {
                         ? activeCategoryButtonRef
                         : undefined
                     }
-                    className={`btn px-4 py-2 rounded-md whitespace-nowrap ${
+                    className={`btn whitespace-nowrap flex items-center px-4 py-2 ${
                       currentQuestion.category === category
-                        ? "bg-orange-500 text-white"
-                        : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                        ? "text-white bg-orange-500 hover:bg-orange-400"
+                        : "text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
                     }`}
                   >
                     {category}
@@ -177,10 +177,10 @@ export default function AssessmentQuestions() {
                   key={option}
                   type="button"
                   onClick={() => handleAnswerClick(option)}
-                  className={`btn px-6 py-3 rounded-md ${
+                  className={`btn flex items-center justify-center px-6 py-3 ${
                     responses[currentQuestion.id] === option
-                      ? "bg-orange-500 text-white"
-                      : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                      ? "text-white bg-orange-500 hover:bg-orange-400"
+                      : "text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
                   }`}
                 >
                   {option}
@@ -192,9 +192,12 @@ export default function AssessmentQuestions() {
                 <button
                   type="button"
                   onClick={handlePrev}
-                  className="btn bg-gray-300 text-gray-700 hover:bg-gray-400 px-6 py-3 rounded-md"
+                  className="btn text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 w-full flex items-center justify-center px-6 py-3"
                 >
-                  Previous
+                  <svg className="w-3 h-3 shrink-0 mt-px mr-2 rotate-180" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                    <path className="fill-current" d="M6.602 11l-.875-.864L9.33 6.534H0v-1.25h9.33L5.727 1.693l.875-.875 5.091 5.091z" />
+                  </svg>
+                  <span>Previous</span>
                 </button>
               )}
             </div>
