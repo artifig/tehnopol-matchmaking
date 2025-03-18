@@ -1,11 +1,13 @@
 export const metadata = {
-  title: 'Contact - Appy',
-  description: 'Page description',
+  title: 'Tehnopol Matchmaking',
+  description: 'Share your business goals and we will find the right people to help you achieve it.',
 }
 
 import PageIllustration from '@/components/page-illustration'
 
-export default function Contact() {
+export default async function Contact({ searchParams }: { searchParams: Promise<{ goals?: string }> }) {
+  const sp = await searchParams;
+  const goals = sp?.goals || "";
   return (
     <>
       {/*  Page illustration */}
@@ -19,8 +21,8 @@ export default function Contact() {
 
             {/* Page header */}
             <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
-              <h1 className="h1 font-red-hat-display mb-4">Get started with Appy in seconds</h1>
-              <p className="text-xl text-gray-600 dark:text-gray-400">We'll send you a text with a link to download the app.</p>
+              <h1 className="h1 font-red-hat-display mb-4">Get started with the assessment</h1>
+              <p className="text-xl text-gray-600 dark:text-gray-400">We'll match you with the best people to help you achieve your business goals.</p>
             </div>
 
             {/* Contact form */}
@@ -51,39 +53,38 @@ export default function Contact() {
                 <div className="w-full px-3">
                   <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="country">Country <span className="text-red-600">*</span></label>
                   <select id="country" className="form-select w-full" required>
-                    <option>United States</option>
-                    <option>United Kingdom</option>
-                    <option>Germany</option>
+                    <option>Estonia</option>
+                    <option>Other</option>
                   </select>
                 </div>
               </div>
               <div className="flex flex-wrap -mx-3 mb-5">
                 <div className="w-full px-3">
                   <div className="flex justify-between items-center mb-1">
-                    <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium" htmlFor="message">Details</label>
+                    <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium" htmlFor="message">Business Goals</label>
                     <span className="text-sm text-gray-500">Optional</span>
                   </div>
-                  <textarea id="message" rows={4} className="form-textarea w-full" placeholder="What do you want to build with Appy?"></textarea>
+                  <textarea id="message" rows={4} className="form-textarea w-full" placeholder="What business goals do you want to achieve?" defaultValue={goals}></textarea>
                 </div>
               </div>
               <div className="flex flex-wrap -mx-3 mb-5">
                 <div className="w-full px-3">
-                  <div className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-3">Tell us about your role</div>
+                  <div className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-3">Tell us about your business</div>
                   <label className="flex items-center mb-2">
                     <input type="radio" className="form-radio" name="role" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400 ml-3">CO-founder</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400 ml-3">Startup</span>
                   </label>
                   <label className="flex items-center mb-2">
                     <input type="radio" className="form-radio" name="role" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400 ml-3">Developer</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400 ml-3">Scaleup</span>
                   </label>
                   <label className="flex items-center mb-2">
                     <input type="radio" className="form-radio" name="role" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400 ml-3">Design / Marketing</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400 ml-3">SME</span>
                   </label>
                   <label className="flex items-center mb-2">
                     <input type="radio" className="form-radio" name="role" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400 ml-3">Other</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400 ml-3">Enterprise</span>
                   </label>
                 </div>
               </div>
