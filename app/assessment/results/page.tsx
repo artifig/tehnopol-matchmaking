@@ -2,6 +2,7 @@
 
 import React from "react";
 import Modal from '@/components/utils/modal';
+import { ResponsiveContainer, RadarChart as RechartsRadarChart, PolarGrid, PolarAngleAxis, Radar, Tooltip } from 'recharts';
 
 interface Provider {
   name: string;
@@ -52,6 +53,20 @@ export default function ResultsPage() {
     }
   ];
 
+  const metrics = {
+    "Business Strategy": 76,
+    "Operations": 54,
+    "Growth & Marketing": 89,
+    "Digital Maturity": 65,
+    "Innovation Readiness": 72,
+    "AI & Data Capabilities": 68,
+    "Team & Skills": 81
+  };
+
+  const overallScore = Math.round(
+    Object.values(metrics).reduce((sum, value) => sum + value, 0) / Object.values(metrics).length
+  );
+
   return (
     <section className="relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
@@ -67,10 +82,10 @@ export default function ResultsPage() {
           {/* Radar Chart Section */}
           <div className="max-w-xl mx-auto w-full mb-12">
             <h2 className="text-2xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Performance Overview</h2>
-            <div className="w-full h-64 flex items-center justify-center mb-6 bg-gray-200 dark:bg-gray-700 rounded-md">
+            <div className="w-full h-64 mb-6">
               <RadarChart />
             </div>
-            <MetricItem title="Overall Score" value={80} />
+            <MetricItem title="Overall Score" value={overallScore} />
             <button 
               onClick={() => setIsMetricsModalOpen(true)} 
               className="btn text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 w-full flex items-center justify-center"
@@ -163,6 +178,10 @@ export default function ResultsPage() {
               <MetricItem title="Business Strategy" value={76} />
               <MetricItem title="Operations" value={54} />
               <MetricItem title="Growth & Marketing" value={89} />
+              <MetricItem title="Digital Maturity" value={65} />
+              <MetricItem title="Innovation Readiness" value={72} />
+              <MetricItem title="AI & Data Capabilities" value={68} />
+              <MetricItem title="Team & Skills" value={81} />
             </div>
           </div>
         </Modal>
@@ -172,9 +191,49 @@ export default function ResultsPage() {
 }
 
 function RadarChart() {
+  const data = [
+    { category: "Business Strategy", value: 76 },
+    { category: "Operations", value: 54 },
+    { category: "Growth & Marketing", value: 89 },
+    { category: "Digital Maturity", value: 65 },
+    { category: "Innovation Readiness", value: 72 },
+    { category: "AI & Data Capabilities", value: 68 },
+    { category: "Team & Skills", value: 81 }
+  ];
+
   return (
-    <div className="w-full h-full flex items-center justify-center">
-      <span className="text-gray-500 dark:text-gray-300">Radar Chart Placeholder</span>
+    <div className="w-full h-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <RechartsRadarChart data={data}>
+          <PolarGrid gridType="circle" />
+          <PolarAngleAxis dataKey="category" tick={{ fill: 'currentColor', fontSize: 12 }} />
+          <Radar
+            name="Performance"
+            dataKey="value"
+            stroke="rgb(249, 115, 22)"
+            fill="rgb(249, 115, 22)"
+            fillOpacity={0.3}
+          />
+          <Tooltip
+            content={({ active, payload }: { active?: boolean; payload?: Array<any> }) => {
+              if (!active || !payload?.length) return null;
+              return (
+                <div className="rounded-lg border bg-white dark:bg-gray-800 p-2 shadow-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-orange-500" />
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      {payload[0].payload.category}
+                    </span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      {payload[0].value}%
+                    </span>
+                  </div>
+                </div>
+              );
+            }}
+          />
+        </RechartsRadarChart>
+      </ResponsiveContainer>
     </div>
   );
 }
