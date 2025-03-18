@@ -42,7 +42,7 @@ type Question = {
 };
 
 // Flatten categories into a single list of questions with category info
-const allQuestions: Question[] = categories.flatMap((cat) => 
+const allQuestions: Question[] = categories.flatMap((cat) =>
   cat.questions.map((q) => ({ ...q, category: cat.title }))
 );
 
@@ -91,7 +91,11 @@ export default function AssessmentQuestions() {
   const activeCategoryButtonRef = useRef<HTMLButtonElement | null>(null);
   useEffect(() => {
     if (activeCategoryButtonRef.current) {
-      activeCategoryButtonRef.current.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      activeCategoryButtonRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
     }
   }, [currentQuestion.category]);
 
@@ -99,16 +103,22 @@ export default function AssessmentQuestions() {
     <section className="relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
         <div className="pt-32 pb-12 md:pt-40 md:pb-20">
+          {/* Header with progress bar */}
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
             <h1 className="h1 font-red-hat-display mb-4">Assessment</h1>
             <p className="text-xl text-gray-600 dark:text-gray-400">
               Question {currentIndex + 1} of {totalQuestions}
             </p>
             <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mt-4">
-              <div className="bg-orange-500 h-2.5 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
+              <div
+                className="bg-orange-500 h-2.5 rounded-full"
+                style={{ width: `${progressPercentage}%` }}
+              ></div>
             </div>
           </div>
-          <div className="max-w-3xl mx-auto w-full px-4 sm:px-6 mb-6">
+
+          {/* Category Navigation */}
+          <div className="max-w-xl mx-auto w-full">
             {/* Mobile Dropdown Navigation */}
             <div className="block sm:hidden mb-4">
               <select
@@ -138,7 +148,11 @@ export default function AssessmentQuestions() {
                     key={category}
                     type="button"
                     onClick={() => handleCategorySelect(startIndex)}
-                    ref={currentQuestion.category === category ? activeCategoryButtonRef : undefined}
+                    ref={
+                      currentQuestion.category === category
+                        ? activeCategoryButtonRef
+                        : undefined
+                    }
                     className={`btn px-4 py-2 rounded-md whitespace-nowrap ${
                       currentQuestion.category === category
                         ? "bg-orange-500 text-white"
@@ -151,8 +165,12 @@ export default function AssessmentQuestions() {
               </div>
             </div>
           </div>
-          <div className="max-w-xl mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-8">
-            <p className="mb-4 font-medium text-lg text-gray-700 dark:text-gray-300">{currentQuestion.question}</p>
+
+          {/* Question Card */}
+          <div className="max-w-xl mx-auto">
+            <p className="mb-4 font-medium text-lg text-gray-700 dark:text-gray-300">
+              {currentQuestion.question}
+            </p>
             <div className="flex flex-col space-y-4 mb-8">
               {options.map((option) => (
                 <button
@@ -185,4 +203,4 @@ export default function AssessmentQuestions() {
       </div>
     </section>
   );
-} 
+}
