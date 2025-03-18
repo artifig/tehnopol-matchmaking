@@ -285,11 +285,11 @@ function SolutionCard({ name, logo, onLearnMore }: { name: string; logo: string;
 }
 
 function handleDownload() {
-  console.log("Download Report clicked.");
-  alert("Report downloaded (mock).");
+  // Redirect to contact page with download parameter
+  window.location.href = `/contact?action=download`;
 }
 
 function handleSendEmail() {
-  console.log("Send Report via Email clicked.");
-  alert("Report sent via email (mock).");
+  // Redirect to contact page with email parameter
+  window.location.href = `/contact?action=email`;
 }
