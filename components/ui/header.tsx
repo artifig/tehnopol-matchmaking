@@ -74,7 +74,7 @@ export default function Header() {
             <ul className="flex justify-end flex-wrap items-center">
               <li>
                 <Link href="/contact" className="btn-sm text-white bg-orange-500 hover:bg-orange-400 ml-6">
-                  Request code
+                  Start matchmaking
                 </Link>
               </li>
             </ul>

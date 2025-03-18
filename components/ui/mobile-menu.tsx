@@ -130,7 +130,7 @@ export default function MobileMenu() {
                   className="font-medium w-full inline-flex items-center justify-center border border-transparent px-4 py-2 my-2 rounded-sm text-white bg-orange-500 hover:bg-orange-400 transition duration-150 ease-in-out"
                   onClick={() => setMobileNavOpen(false)}
                 >
-                  Request code
+                  Start matchmaking
                 </Link>
               </li>
             </ul>

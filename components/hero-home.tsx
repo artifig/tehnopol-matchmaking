@@ -18,7 +18,7 @@ export default function HeroHome() {
               <form className="mt-8" data-aos="fade-down" data-aos-delay="300">
                 <div className="flex flex-col sm:flex-row justify-center max-w-sm mx-auto sm:max-w-md md:mx-0">
                   <input type="tel" className="form-input w-full mb-2 sm:mb-0 sm:mr-2" placeholder="Phone number" aria-label="Phone number" />
-                  <a className="btn text-white bg-orange-500 hover:bg-orange-400 shrink-0" href="#0">Request code</a>
+                  <a className="btn text-white bg-orange-500 hover:bg-orange-400 shrink-0" href="#0">Start matchmaking</a>
                 </div>
                 {/* Success message */}
                 {/* <p className="text-center md:text-left mt-2 opacity-75 text-sm">Thanks for subscribing!</p> */}
