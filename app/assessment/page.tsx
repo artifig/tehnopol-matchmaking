@@ -32,21 +32,44 @@ const categories = [
 
 const options = ["Never", "Occasionally", "Often", "Always"];
 
+type Question = {
+  id: string;
+  question: string;
+  category: string;
+};
+
+// Flatten categories into a single list of questions with category info
+const allQuestions: Question[] = categories.flatMap((cat) => 
+  cat.questions.map((q) => ({ ...q, category: cat.title }))
+);
+
 export default function AssessmentPage() {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [responses, setResponses] = useState<{ [key: string]: string }>({});
   const router = useRouter();
-
-  const handleOptionChange = (questionId: string, value: string) => {
-    setResponses((prev) => ({ ...prev, [questionId]: value }));
+  
+  const currentQuestion = allQuestions[currentIndex];
+  const totalQuestions = allQuestions.length;
+  
+  const handleAnswerClick = (value: string) => {
+    const newResponses = { ...responses, [currentQuestion.id]: value };
+    setResponses(newResponses);
+    if (currentIndex < totalQuestions - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      console.log("Assessment Responses:", newResponses);
+      router.push("/assessment/results");
+    }
   };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Assessment Responses:", responses);
-    // Placeholder navigation to results page
-    router.push("/assessment/results");
+  
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
   };
-
+  
+  const progressPercentage = ((currentIndex + 1) / totalQuestions) * 100;
+  
   return (
     <section className="relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
@@ -54,46 +77,39 @@ export default function AssessmentPage() {
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
             <h1 className="h1 font-red-hat-display mb-4">Assessment</h1>
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              Please answer the following questions to get started.
+              Question {currentIndex + 1} of {totalQuestions}
             </p>
-          </div>
-          <form onSubmit={handleSubmit} className="max-w-xl mx-auto">
-            {categories.map((category, idx) => (
-              <div key={idx} className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4">{category.title}</h2>
-                <div className="space-y-6">
-                  {category.questions.map((q) => (
-                    <div key={q.id}>
-                      <p className="mb-2 font-medium">{q.question}</p>
-                      <div className="flex space-x-4">
-                        {options.map((option) => (
-                          <label key={option} className="flex items-center">
-                            <input
-                              type="radio"
-                              name={q.id}
-                              value={option}
-                              checked={responses[q.id] === option}
-                              onChange={() => handleOptionChange(q.id, option)}
-                              className="form-radio h-4 w-4 text-orange-600"
-                            />
-                            <span className="ml-2 text-gray-700 dark:text-gray-300">{option}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-            <div className="text-center">
-              <button
-                type="submit"
-                className="btn bg-orange-500 text-white hover:bg-orange-600 px-6 py-3 rounded-md"
-              >
-                Submit Assessment
-              </button>
+            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mt-4">
+              <div className="bg-orange-500 h-2.5 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
             </div>
-          </form>
+            <h2 className="text-2xl font-semibold mt-6">{currentQuestion.category}</h2>
+          </div>
+          <div className="max-w-xl mx-auto bg-white dark:bg-gray-800 shadow rounded-lg p-8">
+            <p className="mb-4 font-medium text-lg text-gray-700 dark:text-gray-300">{currentQuestion.question}</p>
+            <div className="flex flex-col space-y-4 mb-8">
+              {options.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  onClick={() => handleAnswerClick(option)}
+                  className={`btn px-6 py-3 rounded-md ${responses[currentQuestion.id] === option ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+            <div className="flex justify-start">
+              {currentIndex > 0 && (
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  className="btn bg-gray-300 text-gray-700 hover:bg-gray-400 px-6 py-3 rounded-md"
+                >
+                  Previous
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </section>
