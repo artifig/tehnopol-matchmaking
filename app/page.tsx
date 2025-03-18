@@ -1,6 +1,6 @@
 export const metadata = {
-  title: 'Home - Appy',
-  description: 'Page description',
+  title: 'Home - Tehnopol Matchmaking',
+  description: 'Our matchmaking platform connects you with the right people to achieve your goals.',
 }
 
 import PageIllustration from '@/components/page-illustration'
@@ -22,14 +22,14 @@ export default function Home() {
         <PageIllustration />
       </div>
       <Hero />
-      <Stats />
+      {/* <Stats />
       <Carousel />
       <Tabs />
       <Process />
       <PricingTables />
       <TestimonialsBlocks />
       <FeaturesBlocks />
-      <Cta />
+      <Cta /> */}
     </>
   )
 }

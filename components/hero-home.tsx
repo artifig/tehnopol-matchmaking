@@ -12,8 +12,8 @@ export default function HeroHome() {
 
             {/* Content */}
             <div className="md:col-span-7 lg:col-span-7 mb-8 md:mb-0 text-center md:text-left">
-              <h1 className="h1 lg:text-6xl mb-4 font-red-hat-display font-black" data-aos="fade-down">Your website, reimagined</h1>
-              <p className="text-xl text-gray-600 dark:text-gray-400" data-aos="fade-down" data-aos-delay="150">Our landing page template works on all devices, so you only have to set it up once, and get beautiful results forever.</p>
+              <h1 className="h1 lg:text-6xl mb-4 font-red-hat-display font-black" data-aos="fade-down">Your potential, unlocked</h1>
+              <p className="text-xl text-gray-600 dark:text-gray-400" data-aos="fade-down" data-aos-delay="150">Our matchmaking platform connects you with the right people to achieve your goals.</p>
               {/* CTA form */}
               <form className="mt-8" data-aos="fade-down" data-aos-delay="300">
                 <div className="flex flex-col sm:flex-row justify-center max-w-sm mx-auto sm:max-w-md md:mx-0">
@@ -28,19 +28,19 @@ export default function HeroHome() {
                   <svg className="w-3 h-3 fill-current text-orange-400 mr-2 shrink-0" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                     <path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z" />
                   </svg>
-                  <span>Lorem ipsum is placeholder text commonly.</span>
+                  <span>Assess your business with a 360° view.</span>
                 </li>
                 <li className="flex items-center mb-2">
                   <svg className="w-3 h-3 fill-current text-orange-400 mr-2 shrink-0" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                     <path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z" />
                   </svg>
-                  <span>Excepteur sint occaecat cupidatat.</span>
+                  <span>Learn how AI can help you grow.</span>
                 </li>
                 <li className="flex items-center mb-2">
                   <svg className="w-3 h-3 fill-current text-orange-400 mr-2 shrink-0" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                     <path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z" />
                   </svg>
-                  <span>Lorem ipsum is placeholder text commonly.</span>
+                  <span>Connect with the right people.</span>
                 </li>
               </ul>
             </div>
