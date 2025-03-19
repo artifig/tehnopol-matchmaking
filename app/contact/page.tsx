@@ -1,10 +1,11 @@
 "use client";
+// This page is now a client component
 
 import PageIllustration from '@/components/page-illustration'
 import Link from "next/link";
 import { useSearchParams } from 'next/navigation';
-import { PDFDownloadLink } from '@react-pdf/renderer';
-import { AssessmentReport } from '../../components/utils/generate-report';
+import { AssessmentReport, downloadReport } from '../../components/utils/generate-report';
+import { useRef } from 'react';
 
 // Mock data - in real app, this would come from your backend/state management
 const metrics = [
@@ -58,42 +59,41 @@ export default function Contact() {
   const searchParams = useSearchParams();
   const action = searchParams.get('action');
   const goals = searchParams.get('goals') || "";
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const buttonAction = formData.get('action');
-    
-    // Here you would typically send the form data to your backend
-    console.log('Form submitted:', Object.fromEntries(formData));
+  const handleDownloadClick = async () => {
+    if (!formRef.current) return;
+    if (!formRef.current.reportValidity()) return; // trigger HTML validation
 
+    const formData = new FormData(formRef.current);
     const userInfo = {
       firstName: formData.get('firstName') as string,
       lastName: formData.get('lastName') as string,
       company: formData.get('company') as string,
       email: formData.get('email') as string,
     };
-
-    // For results page actions, we'll handle both download and email
-    if (action === 'download' || action === 'email') {
-      // Save the contact information first
-      console.log('Saving contact information...');
-      
-      if (buttonAction === 'download') {
-        handleDownload(userInfo);
-      }
-      if (buttonAction === 'email') {
-        handleEmail(formData.get('email') as string);
-      }
-    } else {
-      // Regular contact form submission - redirect to assessment
-      window.location.href = '/assessment';
-    }
+    console.log('Download button clicked with:', userInfo);
+    await handleDownload(userInfo);
   };
 
-  const handleDownload = (userInfo: any) => {
-    // The download will be handled by PDFDownloadLink
-    console.log('Preparing report download...');
+  const handleEmailClick = () => {
+    if (!formRef.current) return;
+    if (!formRef.current.reportValidity()) return; // trigger HTML validation
+
+    const formData = new FormData(formRef.current);
+    const email = formData.get('email') as string;
+    console.log('Email button clicked with email:', email);
+    handleEmail(email);
+  };
+
+  const handleDownload = async (userInfo: any) => {
+    console.log('Initiating download with userInfo:', userInfo);
+    try {
+      await downloadReport({ metrics, overallScore, providers, userInfo });
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to generate report');
+    }
   };
 
   const handleEmail = (email: string) => {
@@ -124,7 +124,7 @@ export default function Contact() {
             </div>
 
             {/* Contact form */}
-            <form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
+            <form className="max-w-xl mx-auto" ref={formRef}>
               <div className="flex flex-wrap -mx-3 mb-5">
                 <div className="w-full md:w-1/2 px-3 mb-4 md:mb-0">
                   <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="first-name">First Name <span className="text-red-600">*</span></label>
@@ -198,61 +198,28 @@ export default function Contact() {
               )}
               <div className="flex flex-wrap -mx-3 mt-6">
                 <div className="w-full px-3">
-                  {action ? (
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <PDFDownloadLink
-                        document={
-                          <AssessmentReport
-                            metrics={metrics}
-                            overallScore={overallScore}
-                            providers={providers}
-                            userInfo={{
-                              firstName: "",
-                              lastName: "",
-                              company: "",
-                              email: "",
-                            }}
-                          />
-                        }
-                        fileName="assessment-report.pdf"
-                        className="btn text-white bg-orange-500 hover:bg-orange-400 w-full sm:w-auto flex items-center justify-center px-6 py-3"
-                      >
-                        {({ blob, url, loading, error }) =>
-                          loading ? 'Preparing Download...' : (
-                            <>
-                              <span>Download Report</span>
-                              <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
-                                <path className="fill-current" d="M6 8.825L11.4 3.425L10.675 2.7L6.75 6.625V0H5.25V6.625L1.325 2.7L0.6 3.425L6 8.825ZM0.75 12H11.25V10.5H0.75V12Z" />
-                              </svg>
-                            </>
-                          )
-                        }
-                      </PDFDownloadLink>
-                      <button
-                        type="submit"
-                        name="action"
-                        value="email"
-                        className="btn text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 w-full sm:w-auto flex items-center justify-center px-6 py-3"
-                      >
-                        <span>Email Report</span>
-                        <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
-                          <path className="fill-current" d="M10.5 0H1.5C0.675 0 0 0.675 0 1.5V10.5C0 11.325 0.675 12 1.5 12H10.5C11.325 12 12 11.325 12 10.5V1.5C12 0.675 11.325 0 10.5 0ZM10.5 3L6 6.75L1.5 3V1.5L6 5.25L10.5 1.5V3Z" />
-                        </svg>
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex justify-center">
-                      <button 
-                        type="submit"
-                        className="btn text-white bg-orange-500 hover:bg-orange-400 w-full sm:w-auto flex items-center justify-center px-6 py-3"
-                      >
-                        <span>Start Assessment</span>
-                        <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
-                          <path className="fill-current" d="M6.602 11l-.875-.864L9.33 6.534H0v-1.25h9.33L5.727 1.693l.875-.875 5.091 5.091z" />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button
+                      type="button"
+                      onClick={handleDownloadClick}
+                      className="btn text-white bg-orange-500 hover:bg-orange-400 w-full sm:w-auto flex items-center justify-center px-6 py-3"
+                    >
+                      <span>Download Report</span>
+                      <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                        <path className="fill-current" d="M6 8.825L11.4 3.425L10.675 2.7L6.75 6.625V0H5.25V6.625L1.325 2.7L0.6 3.425L6 8.825ZM0.75 12H11.25V10.5H0.75V12Z" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleEmailClick}
+                      className="btn text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 w-full sm:w-auto flex items-center justify-center px-6 py-3"
+                    >
+                      <span>Email Report</span>
+                      <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                        <path className="fill-current" d="M10.5 0H1.5C0.675 0 0 0.675 0 1.5V10.5C0 11.325 0.675 12 1.5 12H10.5C11.325 12 12 11.325 12 10.5V1.5C12 0.675 11.325 0 10.5 0ZM10.5 3L6 6.75L1.5 3V1.5L6 5.25L10.5 1.5V3Z" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             </form>

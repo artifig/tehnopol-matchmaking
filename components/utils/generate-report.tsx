@@ -1,4 +1,5 @@
 import { Document, Page, Text, View, StyleSheet, Image, Svg, Path, G, Circle, Line } from '@react-pdf/renderer';
+import { pdf } from '@react-pdf/renderer';
 
 // Create styles
 const styles = StyleSheet.create({
@@ -369,4 +370,42 @@ export const AssessmentReport = ({ metrics, overallScore, providers, userInfo }:
       </Page>
     </Document>
   );
+};
+
+export const downloadReport = async ({ metrics, overallScore, providers, userInfo }: { metrics: any; overallScore: any; providers: any; userInfo: any; }) => {
+  console.log('Generating PDF report with userInfo:', userInfo);
+  const report = (
+    <AssessmentReport
+      metrics={metrics}
+      overallScore={overallScore}
+      providers={providers}
+      userInfo={userInfo}
+    />
+  );
+  try {
+    console.log('Calling pdf(report).toBlob()');
+    const blob = await pdf(report).toBlob();
+    console.log('PDF blob created:', blob, 'size:', blob.size, 'type:', blob.type);
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'assessment-report.pdf';
+    console.log('Triggering download via dispatchEvent...');
+    document.body.appendChild(link);
+    const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true, view: window });
+    link.dispatchEvent(clickEvent);
+    // Fallback: if dispatchEvent didn't trigger the download, attempt window.open after 500ms
+    setTimeout(() => {
+      console.log('Fallback: attempting window.open');
+      window.open(url, '_blank');
+      if(document.body.contains(link)) {
+        document.body.removeChild(link);
+      }
+      window.URL.revokeObjectURL(url);
+    }, 500);
+    console.log('Download process initiated.');
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw error;
+  }
 }; 
