@@ -143,7 +143,7 @@ const createRadarPath = (centerX: number, centerY: number, radius: number, point
 const RadarChartPDF = ({ data }: { data: { category: string; value: number }[] }) => {
   const centerX = 300;
   const centerY = 100;
-  const radius = 50;
+  const radius = 75; 
   const numPoints = data.length;
   const values = data.map(d => d.value);
 
