@@ -263,7 +263,7 @@ function SolutionCard({ name, logo, onLearnMore }: { name: string; logo: string;
           <img 
             src={logo} 
             alt={`${name} logo`} 
-            className={`w-full h-full object-contain ${logo.includes('AIRE') ? 'invert' : ''}`}
+            className={`w-full h-full object-contain ${logo.includes('AIRE') ? 'dark:invert' : ''}`}
           />
         </div>
         <div className="flex-1 min-w-0">

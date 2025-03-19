@@ -3,6 +3,56 @@
 import PageIllustration from '@/components/page-illustration'
 import Link from "next/link";
 import { useSearchParams } from 'next/navigation';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { AssessmentReport } from '../../components/utils/generate-report';
+
+// Mock data - in real app, this would come from your backend/state management
+const metrics = [
+  { category: "Business Strategy", value: 76 },
+  { category: "Operations", value: 54 },
+  { category: "Growth & Marketing", value: 89 },
+  { category: "Digital Maturity", value: 65 },
+  { category: "Innovation Readiness", value: 72 },
+  { category: "AI & Data Capabilities", value: 68 },
+  { category: "Team & Skills", value: 81 }
+];
+
+const providers = [
+  {
+    name: "Science and Business Park Tehnopol",
+    logo: "/logo/logo-Tehnopol.png",
+    shortDescription: "Expert in Business Strategy and Operations",
+    details: "We are a team of experts in business strategy and operations with vast experience in supporting startups and scaleups.",
+    contactName: "Rauno Varblas",
+    contactRole: "Head of AI and Innovation",
+    contactEmail: "rauno.varblas@tehnopol.ee",
+    contactPhone: "+372 5123 4567"
+  },
+  {
+    name: "AI & Robotics Estonia",
+    logo: "/logo/logo-AIRE.png",
+    shortDescription: "Consortia of Estonian AI and Robotics academics",
+    details: "We are flexible team of academics and support staff, ready to help you with your AI and robotics projects.",
+    contactName: "Evelin Ebruk",
+    contactRole: "Head of Client Relations",
+    contactEmail: "evelin.ebruk@aire-edih.eu",
+    contactPhone: "+372 5987 6543"
+  },
+  {
+    name: "Artifig",
+    logo: "/logo/logo-Artifig.png",
+    shortDescription: "Technical AI Solutions and Strategy",
+    details: "We are a small team of experts in AI with an academic background, and plenty of business experience. We are dedicated to providing the best possible solutions for our clients.",
+    contactName: "Otto Mättas",
+    contactRole: "AI Solutions Architect",
+    contactEmail: "otto@artifig.com",
+    contactPhone: "+372 5662 8362"
+  }
+];
+
+const overallScore = Math.round(
+  metrics.reduce((sum, metric) => sum + metric.value, 0) / metrics.length
+);
 
 export default function Contact() {
   const searchParams = useSearchParams();
@@ -17,13 +67,20 @@ export default function Contact() {
     // Here you would typically send the form data to your backend
     console.log('Form submitted:', Object.fromEntries(formData));
 
+    const userInfo = {
+      firstName: formData.get('firstName') as string,
+      lastName: formData.get('lastName') as string,
+      company: formData.get('company') as string,
+      email: formData.get('email') as string,
+    };
+
     // For results page actions, we'll handle both download and email
     if (action === 'download' || action === 'email') {
       // Save the contact information first
       console.log('Saving contact information...');
       
       if (buttonAction === 'download') {
-        handleDownload();
+        handleDownload(userInfo);
       }
       if (buttonAction === 'email') {
         handleEmail(formData.get('email') as string);
@@ -34,10 +91,9 @@ export default function Contact() {
     }
   };
 
-  const handleDownload = () => {
-    // Here you would typically generate and trigger the report download
-    console.log('Downloading report...');
-    alert('Report download started');
+  const handleDownload = (userInfo: any) => {
+    // The download will be handled by PDFDownloadLink
+    console.log('Preparing report download...');
   };
 
   const handleEmail = (email: string) => {
@@ -144,17 +200,34 @@ export default function Contact() {
                 <div className="w-full px-3">
                   {action ? (
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <button
-                        type="submit"
-                        name="action"
-                        value="download"
+                      <PDFDownloadLink
+                        document={
+                          <AssessmentReport
+                            metrics={metrics}
+                            overallScore={overallScore}
+                            providers={providers}
+                            userInfo={{
+                              firstName: "",
+                              lastName: "",
+                              company: "",
+                              email: "",
+                            }}
+                          />
+                        }
+                        fileName="assessment-report.pdf"
                         className="btn text-white bg-orange-500 hover:bg-orange-400 w-full sm:w-auto flex items-center justify-center px-6 py-3"
                       >
-                        <span>Download Report</span>
-                        <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
-                          <path className="fill-current" d="M6 8.825L11.4 3.425L10.675 2.7L6.75 6.625V0H5.25V6.625L1.325 2.7L0.6 3.425L6 8.825ZM0.75 12H11.25V10.5H0.75V12Z" />
-                        </svg>
-                      </button>
+                        {({ blob, url, loading, error }) =>
+                          loading ? 'Preparing Download...' : (
+                            <>
+                              <span>Download Report</span>
+                              <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+                                <path className="fill-current" d="M6 8.825L11.4 3.425L10.675 2.7L6.75 6.625V0H5.25V6.625L1.325 2.7L0.6 3.425L6 8.825ZM0.75 12H11.25V10.5H0.75V12Z" />
+                              </svg>
+                            </>
+                          )
+                        }
+                      </PDFDownloadLink>
                       <button
                         type="submit"
                         name="action"
