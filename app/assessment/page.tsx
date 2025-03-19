@@ -1,9 +1,10 @@
 "use client";
+export const dynamic = "force-dynamic";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function StartAssessment() {
+function AssessmentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialBusinessGoals = searchParams.get("goals") || "";
@@ -12,7 +13,6 @@ export default function StartAssessment() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Add any necessary validations here
     console.log("Starting assessment with", { businessGoals, companyType });
     router.push("/assessment/questions");
   };
@@ -21,23 +21,21 @@ export default function StartAssessment() {
     <section className="relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
         <div className="pt-32 pb-12 md:pt-40 md:pb-20">
-
           {/* Page header */}
           <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
-            <h1 className="h1 font-red-hat-display mb-4">Start Your Assessment</h1>
+            <h1 className="h1 font-red-hat-display mb-4">
+              Start Your Assessment
+            </h1>
             <p className="text-xl text-gray-600 dark:text-gray-400">
               Please enter your business goals and select your company type to begin.
             </p>
           </div>
-
+  
           {/* Form */}
           <form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
             <div className="flex flex-wrap -mx-3 mb-5">
               <div className="w-full px-3 mb-5">
-                <label
-                  className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1"
-                  htmlFor="businessGoals"
-                >
+                <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="businessGoals">
                   Business Goals <span className="text-red-600">*</span>
                 </label>
                 <textarea
@@ -53,10 +51,7 @@ export default function StartAssessment() {
             </div>
             <div className="flex flex-wrap -mx-3 mb-5">
               <div className="w-full px-3">
-                <label
-                  className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1"
-                  htmlFor="companyType"
-                >
+                <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="companyType">
                   Company Type <span className="text-red-600">*</span>
                 </label>
                 <select
@@ -85,9 +80,17 @@ export default function StartAssessment() {
               </div>
             </div>
           </form>
-
+  
         </div>
       </div>
     </section>
+  );
+}
+
+export default function StartAssessment() {
+  return (
+    <Suspense fallback={<div>Loading assessment...</div>}>
+      <AssessmentContent />
+    </Suspense>
   );
 }

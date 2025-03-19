@@ -3,9 +3,8 @@
 
 import PageIllustration from '@/components/page-illustration'
 import Link from "next/link";
-import { useSearchParams } from 'next/navigation';
-import { AssessmentReport, downloadReport } from '../../components/utils/generate-report';
 import { useRef } from 'react';
+import { AssessmentReport, downloadReport } from '../../components/utils/generate-report';
 
 // Mock data - in real app, this would come from your backend/state management
 const metrics = [
@@ -56,9 +55,6 @@ const overallScore = Math.round(
 );
 
 export default function Contact() {
-  const searchParams = useSearchParams();
-  const action = searchParams.get('action');
-  const goals = searchParams.get('goals') || "";
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleDownloadClick = async () => {
@@ -116,10 +112,10 @@ export default function Contact() {
             {/* Page header */}
             <div className="max-w-3xl mx-auto text-center pb-12 md:pb-16">
               <h1 className="h1 font-red-hat-display mb-4">
-                {action ? 'Complete your details to continue' : 'Get started with the assessment'}
+                Complete your details to receive your report
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-400">
-                {action ? 'Please provide your contact information to receive the report.' : "We'll match you with the best people to help you achieve your business goals."}
+                Please provide your contact information.
               </p>
             </div>
 
@@ -162,40 +158,6 @@ export default function Contact() {
                   </select>
                 </div>
               </div>
-              {!action && (
-                <>
-                  <div className="flex flex-wrap -mx-3 mb-5">
-                    <div className="w-full px-3">
-                      <div className="flex justify-between items-center mb-1">
-                        <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium" htmlFor="message">Business Goals</label>
-                        <span className="text-sm text-gray-500">Optional</span>
-                      </div>
-                      <textarea id="message" name="message" rows={4} className="form-textarea w-full" placeholder="What business goals do you want to achieve?" defaultValue={goals}></textarea>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-5">
-                    <div className="w-full px-3">
-                      <div className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-3">Tell us about your business</div>
-                      <label className="flex items-center mb-2">
-                        <input type="radio" className="form-radio" name="businessType" value="startup" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400 ml-3">Startup</span>
-                      </label>
-                      <label className="flex items-center mb-2">
-                        <input type="radio" className="form-radio" name="businessType" value="scaleup" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400 ml-3">Scaleup</span>
-                      </label>
-                      <label className="flex items-center mb-2">
-                        <input type="radio" className="form-radio" name="businessType" value="sme" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400 ml-3">SME</span>
-                      </label>
-                      <label className="flex items-center mb-2">
-                        <input type="radio" className="form-radio" name="businessType" value="enterprise" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400 ml-3">Enterprise</span>
-                      </label>
-                    </div>
-                  </div>
-                </>
-              )}
               <div className="flex flex-wrap -mx-3 mt-6">
                 <div className="w-full px-3">
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
