@@ -113,9 +113,10 @@ const styles = StyleSheet.create({
   },
   radarChartContainer: {
     width: '100%',
-    height: 250,
+    height: 200,
     marginVertical: 10,
     alignItems: 'center',
+    padding: 10,
   },
 });
 
@@ -140,13 +141,13 @@ const createRadarPath = (centerX: number, centerY: number, radius: number, point
 };
 
 const RadarChartPDF = ({ data }: { data: { category: string; value: number }[] }) => {
-  const centerX = 150;
-  const centerY = 125;
-  const radius = 85;
+  const centerX = 300;
+  const centerY = 100;
+  const radius = 50;
   const numPoints = data.length;
   const values = data.map(d => d.value);
 
-  // Create grid lines and labels
+  // Create grid lines
   const gridLines = Array.from({ length: 5 }, (_, i) => {
     const gridRadius = radius * ((i + 1) / 5);
     const points: string[] = [];
@@ -160,45 +161,17 @@ const RadarChartPDF = ({ data }: { data: { category: string; value: number }[] }
     return points.join(' ');
   });
 
-  // Create axis lines and labels
+  // Create axis lines
   const axisLines = data.map((_, i) => {
     const angle = (360 / numPoints) * i;
     const point = polarToCartesian(centerX, centerY, radius, angle);
     return `M ${centerX} ${centerY} L ${point.x} ${point.y}`;
   });
 
-  // Helper function to position labels based on angle
-  const getLabelPosition = (angle: number, point: { x: number; y: number }) => {
-    // Adjust label position based on which quadrant it's in
-    let xOffset = 0;
-    let yOffset = 0;
-    let anchor: 'start' | 'middle' | 'end' = 'middle';
-
-    if (angle <= 30 || angle >= 330) {
-      yOffset = -4;
-      anchor = 'middle';
-    } else if (angle < 150) {
-      xOffset = 10;
-      anchor = 'start';
-    } else if (angle <= 210) {
-      yOffset = 8;
-      anchor = 'middle';
-    } else if (angle < 330) {
-      xOffset = -10;
-      anchor = 'end';
-    }
-
-    return {
-      x: point.x + xOffset,
-      y: point.y + yOffset,
-      anchor,
-    };
-  };
-
   return (
     <View style={styles.radarChartContainer}>
-      <Svg width="300" height="250">
-        {/* Grid circles with value labels */}
+      <Svg width="600" height="200">
+        {/* Grid circles */}
         {gridLines.map((points, i) => (
           <G key={`grid-${i}`}>
             <Circle
@@ -209,17 +182,6 @@ const RadarChartPDF = ({ data }: { data: { category: string; value: number }[] }
               strokeWidth={0.5}
               fill="none"
             />
-            <Text
-              x={centerX}
-              y={centerY - (radius * ((i + 1) / 5)) - 2}
-              style={{
-                fontSize: 6,
-                fill: '#6B7280',
-                textAnchor: 'middle',
-              }}
-            >
-              {((i + 1) * 20)}%
-            </Text>
           </G>
         ))}
 
@@ -245,18 +207,17 @@ const RadarChartPDF = ({ data }: { data: { category: string; value: number }[] }
         {/* Category labels */}
         {data.map((d, i) => {
           const angle = (360 / numPoints) * i;
-          const point = polarToCartesian(centerX, centerY, radius + 15, angle);
-          const labelPos = getLabelPosition(angle, point);
+          const point = polarToCartesian(centerX, centerY, radius + 8, angle);
           
           return (
             <Text
               key={`label-${i}`}
-              x={labelPos.x}
-              y={labelPos.y}
+              x={point.x}
+              y={point.y}
               style={{
-                fontSize: 8,
+                fontSize: 6,
                 fill: '#4B5563',
-                textAnchor: labelPos.anchor,
+                textAnchor: angle > 180 ? 'end' : (angle === 0 || angle === 180 ? 'middle' : 'start'),
               }}
             >
               {d.category}
