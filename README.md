@@ -29,6 +29,11 @@ Tehnopol Matchmaking is a dynamic website offering a variety of pages and intera
 
 3. Set up your environment variables:
    - Create a `.env.local` file in the root directory.
+     ```bash
+     AIRTABLE_PERSONAL_ACCESS_TOKEN=your_personal_access_token
+     AIRTABLE_BASE_ID=your_base_id
+     ```
+
    - Add the required environment variables, including the Airtable API keys.
    - Note: The app is currently running in production on Vercel where the environment variables are defined directly. The `.env.local` file is only for local development and testing purposes.
 
@@ -42,7 +47,7 @@ Tehnopol Matchmaking is a dynamic website offering a variety of pages and intera
 
 5. To make sure the code compiles:
     - Run:
-    ```bash
+     ```bash
      npm run build
      # or
      yarn build
