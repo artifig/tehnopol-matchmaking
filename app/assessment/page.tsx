@@ -11,10 +11,25 @@ function AssessmentContent() {
   const [businessGoals, setBusinessGoals] = useState(initialBusinessGoals);
   const [companyType, setCompanyType] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Starting assessment with", { businessGoals, companyType });
-    router.push("/assessment/questions");
+    try {
+      const response = await fetch('/api/assessment/createResponse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ businessGoals, companyType })
+      });
+      const data = await response.json();
+      if (!data.success) {
+        console.error('Error creating assessment response:', data.error);
+        return;
+      }
+      console.log('Created assessment response:', data.record);
+    } catch (error) {
+      console.error('Error storing assessment response', error);
+      return;
+    }
+    router.push('/assessment/questions');
   };
 
   return (
