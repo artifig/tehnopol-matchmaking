@@ -56,7 +56,7 @@ export async function GET(request: Request) {
       .map(id => `RECORD_ID() = "${id}"`)
       .join(', ');
     const filterFormula = `OR(${orConditions})`;
-    // Fetch the MethodCategories records using the filter formula
+    // Fetch the MethodCategories records using the filter formula with sorting
     const categoryRecords = await baseAirtable('MethodCategories')
       .select({ 
         filterByFormula: filterFormula,
