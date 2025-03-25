@@ -79,14 +79,32 @@ export default function AssessmentQuestions() {
     setCurrentIndex(startIndex);
   };
 
-  const handleAnswerClick = (value: string) => {
+  const handleAnswerClick = async (value: string) => {
     const newResponses = { ...responses, [currentQuestion.id]: value };
     setResponses(newResponses);
     if (currentIndex < totalQuestions - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      console.log("Assessment Responses:", newResponses);
-      router.push("/assessment/results");
+      // Last question answered: save responses
+      const responseId = localStorage.getItem('responseId');
+      if (!responseId) {
+        console.error('Response ID not found in localStorage');
+      } else {
+        try {
+          const saveResponse = await fetch('/api/assessment/saveResponses', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ responseId, responses: newResponses })
+          });
+          const saveData = await saveResponse.json();
+          if (!saveData.success) {
+            console.error('Error saving responses:', saveData.error);
+          }
+        } catch (error) {
+          console.error('Error saving responses:', error);
+        }
+      }
+      router.push('/assessment/results');
     }
   };
 

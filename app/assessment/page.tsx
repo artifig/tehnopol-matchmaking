@@ -27,6 +27,7 @@ function AssessmentContent() {
       console.log('Created assessment response:', data.record);
       // Store the selected companyType in localStorage for use in the questions page
       localStorage.setItem('selectedCompanyType', companyType);
+      localStorage.setItem('responseId', data.record.fields?.responseId || data.record.responseId);
     } catch (error) {
       console.error('Error storing assessment response', error);
       return;
