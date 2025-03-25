@@ -12,19 +12,8 @@ type Category = {
 
 type Question = {
   id: string;
-  question: string;
+  questionText_en: string;
   category: string;
-};
-
-// Remove the hard-coded categories array and replace with mock questions generator
-const generateMockQuestions = (categoryId: string, categoryTitle: string): Question[] => {
-  return [
-    { id: `${categoryId}-q1`, question: `How well does your company align with ${categoryTitle}?`, category: categoryTitle },
-    { id: `${categoryId}-q2`, question: `What specific initiatives have you implemented in ${categoryTitle}?`, category: categoryTitle },
-    { id: `${categoryId}-q3`, question: `How do you measure success in ${categoryTitle}?`, category: categoryTitle },
-    { id: `${categoryId}-q4`, question: `What challenges have you faced in ${categoryTitle}?`, category: categoryTitle },
-    { id: `${categoryId}-q5`, question: `What improvements are you planning in ${categoryTitle}?`, category: categoryTitle },
-  ];
 };
 
 // Options for answers
@@ -66,11 +55,11 @@ export default function AssessmentQuestions() {
         const response = await fetch(`/api/assessment/fetchCategories?companyType=${selectedCompanyType}`);
         const data = await response.json();
         if (data.success) {
-          // Use categories directly from Airtable without sorting
+          // Use categories directly from Airtable with nested questions
           setCategories(data.categories);
-          // Generate mock questions for each category
-          const questions = data.categories.flatMap((category: Category) => 
-            generateMockQuestions(category.id, category.categoryText_en)
+          // Extract questions from each category and attach the category text
+          const questions = data.categories.flatMap((category: Category & { questions: any[] }) =>
+            (category.questions || []).map((q: any) => ({ ...q, category: category.categoryText_en }))
           );
           setAllQuestions(questions);
           setTotalQuestions(questions.length);
@@ -209,7 +198,7 @@ export default function AssessmentQuestions() {
           {currentQuestion && (
             <div className="max-w-xl mx-auto">
               <p className="mb-4 font-medium text-lg text-gray-700 dark:text-gray-300">
-                {currentQuestion.question}
+                {currentQuestion.questionText_en}
               </p>
               <div className="flex flex-col space-y-4 mb-8">
                 {options.map((option) => (

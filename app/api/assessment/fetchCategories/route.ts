@@ -63,13 +63,47 @@ export async function GET(request: Request) {
         sort: [{ field: 'categoryId', direction: 'asc' }]
       })
       .firstPage();
-    // Map the results to include the id, categoryText_en, and categoryDescription_en
-    const categories = categoryRecords.map(record => ({
+
+    // Map each category to include linked question IDs with explicit type cast and filtering
+    const categoriesWithQuestionsIds = categoryRecords.map(record => ({
       id: record.id,
       categoryText_en: record.fields.categoryText_en,
-      categoryDescription_en: record.fields.categoryDescription_en
+      categoryDescription_en: record.fields.categoryDescription_en,
+      methodQuestions: Array.isArray(record.fields.MethodQuestions) ? record.fields.MethodQuestions.filter((item): item is string => typeof item === 'string') : []
     }));
-    return NextResponse.json({ success: true, categories });
+
+    // Gather unique question IDs from all categories
+    const allQuestionIds = Array.from(new Set(categoriesWithQuestionsIds.flatMap(cat => cat.methodQuestions)));
+
+    // Initialize questions mapping with proper type
+    let questionsMapping: Record<string, { id: string; questionText_en: string }> = {};
+    if (allQuestionIds.length > 0) {
+      const orConditionsQ = allQuestionIds.map(id => `RECORD_ID() = "${id}"`).join(', ');
+      const filterFormulaQ = `OR(${orConditionsQ})`;
+      const questionRecords = await baseAirtable('MethodQuestions')
+        .select({
+          filterByFormula: filterFormulaQ,
+          sort: [{ field: 'questionId', direction: 'asc' }]
+        })
+        .firstPage();
+      questionsMapping = questionRecords.reduce((acc, record) => {
+        acc[record.id] = {
+          id: record.id,
+          questionText_en: typeof record.fields.questionText_en === 'string' ? record.fields.questionText_en : ''
+        };
+        return acc;
+      }, {} as Record<string, { id: string; questionText_en: string }>);
+    }
+
+    // Attach fetched questions to each category
+    const categoriesWithQuestions = categoriesWithQuestionsIds.map(cat => ({
+      ...cat,
+      questions: (cat.methodQuestions as string[])
+        .map((qid: string) => questionsMapping[qid])
+        .filter((q) => q !== undefined)
+    }));
+
+    return NextResponse.json({ success: true, categories: categoriesWithQuestions });
   } catch (error: any) {
     console.error('Error fetching assessment categories:', error);
     return NextResponse.json(
