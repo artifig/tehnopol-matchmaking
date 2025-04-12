@@ -82,13 +82,7 @@ export async function POST(request: NextRequest) {
       fieldsToUpdate.contactEmail = contactEmail;
     }
     if (contactCompanyRegistrationNumber) {
-        // Convert string from form to number for Airtable
-        const regNum = parseInt(contactCompanyRegistrationNumber, 10);
-        if (!isNaN(regNum)) {
-             fieldsToUpdate.contactCompanyRegistrationNumber = regNum;
-        } else {
-             console.warn(`Invalid contactCompanyRegistrationNumber received: ${contactCompanyRegistrationNumber}. Skipping update.`);
-        }
+        fieldsToUpdate.contactCompanyRegistrationNumber = contactCompanyRegistrationNumber;
     }
     if (contactPhoneNumber) {
         fieldsToUpdate.contactPhoneNumber = contactPhoneNumber;
