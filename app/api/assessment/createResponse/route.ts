@@ -39,10 +39,14 @@ export async function POST(request: Request) {
 
     // Create the AssessmentResponses record with businessGoals and the linked company type record
     // The linked field in AssessmentResponses is named 'MethodCompanyTypes'
-    const record = await createRecord('AssessmentResponses', {
+    const recordData = {
       businessGoals,
-      MethodCompanyTypes: [linkedRecordId]
-    });
+      MethodCompanyTypes: [linkedRecordId],
+      responseStatus: "New" // Set initial status
+    };
+    console.log("Creating AssessmentResponses record with data:", recordData);
+    const record = await createRecord('AssessmentResponses', recordData);
+    
     return NextResponse.json({ success: true, record });
   } catch (error: any) {
     console.error('Error creating assessment response:', error);

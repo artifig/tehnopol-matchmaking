@@ -60,21 +60,22 @@ Tehnopol Matchmaking is a dynamic website offering a variety of pages and intera
 ## Assessment Workflow
 
 1.  **Goal Input:** (Implicit or external) User defines business goals.
-2.  **Start Page (`/assessment`):** User inputs `businessGoals` and selects `companyType`. An initial `AssessmentResponses` record is created in Airtable via `/api/assessment/createResponse`, returning a `responseId`.
+2.  **Start Page (`/assessment`):** User inputs `businessGoals` and selects `companyType`. An initial `AssessmentResponses` record is created in Airtable via `/api/assessment/createResponse`. This sets `responseStatus` to "New" and returns a `responseId`.
 3.  **Questions Page (`/assessment/questions`):** 
     - Fetches relevant `MethodCategories` and associated `MethodQuestions` via `/api/assessment/fetchCategories` based on `companyType` (from `localStorage`).
     - User answers questions.
     - Upon completion, all answers (mapping `questionId` -> `answerText`) are sent along with `responseId` (from `localStorage`) to `/api/assessment/saveResponses`.
-    - The API saves the answers as a JSON string in the `responseContent` field of the corresponding `AssessmentResponses` record.
+    - The API saves the answers as a JSON string in the `responseContent` field and updates the `responseStatus` to "Completed" in the corresponding `AssessmentResponses` record.
 4.  **Results Page (`/assessment/results`):**
     - Fetches calculated `metrics` and matched `providers` from `/api/assessment/fetchResults` using `responseId` (from `localStorage`). **(Note: This API currently returns mock data; calculation logic needs implementation).**
     - Displays results, including a radar chart and provider cards.
-    - Stores `metrics` and `providers` in `localStorage` before redirecting for report actions.
+    - Stores `metrics`, `providers`, and `responseId` in `localStorage` before redirecting for report actions.
 5.  **Contact Page (`/contact?action=download` or `?action=email`):**
-    - Retrieves `metrics` and `providers` from `localStorage`.
-    - User enters contact details.
-    - **Download:** If `action=download`, clicking the button triggers client-side PDF generation (`@react-pdf/renderer`) using the retrieved data and user info, then initiates a download.
-    - **Email:** If `action=email`, clicking the button currently shows a simulation alert. (Requires implementation of an email sending mechanism, likely via another API call).
+    - Retrieves `metrics`, `providers`, and `responseId` from `localStorage`.
+    - User enters contact details (using form fields named after Airtable fields like `contactFirstName`, `contactPhoneNumber`, etc.).
+    - Clicking Download/Email first calls `/api/assessment/updateContactInfo` to save the contact details (First Name, Last Name, Email, Phone, Company, Reg Number, Country) to the Airtable record using the `responseId`.
+    - **Download:** If update is successful and `action=download`, it triggers client-side PDF generation (`@react-pdf/renderer`) using the retrieved assessment data and user info, then initiates a download.
+    - **Email:** If update is successful and `action=email`, it currently shows a simulation alert. (Requires implementation of an email sending mechanism).
 
 ## Airtable Data Saving Strategy
 

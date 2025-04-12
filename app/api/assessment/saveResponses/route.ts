@@ -34,10 +34,13 @@ export async function POST(request: Request) {
 
     // Use the internal record id (record id) of the first matching record
     const record = responseRecords[0];
-    // Update the record's responseContent field using the internal record id
-    const updatedRecord = await baseAirtable('AssessmentResponses').update(record.id, {
-      responseContent: JSON.stringify(responses)
-    });
+    // Update the record's responseContent field and status using the internal record id
+    const fieldsToUpdate = {
+      responseContent: JSON.stringify(responses),
+      responseStatus: "Completed" // Set status to Completed
+    };
+    console.log(`Updating record ${record.id} with fields:`, fieldsToUpdate);
+    const updatedRecord = await baseAirtable('AssessmentResponses').update(record.id, fieldsToUpdate);
 
     return NextResponse.json({ success: true, record: updatedRecord });
   } catch (error: any) {
