@@ -3,7 +3,7 @@
 
 import PageIllustration from '@/components/page-illustration'
 import Link from "next/link";
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, Suspense } from 'react';
 import { AssessmentReport, downloadReport } from '../../components/utils/generate-report';
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -24,7 +24,8 @@ interface Provider {
   contactRole: string;
 }
 
-export default function Contact() {
+// Define the main content component that uses useSearchParams
+function ContactContent() {
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -384,4 +385,31 @@ export default function Contact() {
       </section>
     </>
   )
+}
+
+// Default export wraps the main content in Suspense
+export default function ContactPage() {
+  // Simple fallback UI
+  const fallbackUI = (
+     <>
+        <div className="relative max-w-6xl mx-auto h-0 pointer-events-none -z-1" aria-hidden="true">
+          <PageIllustration />
+        </div>
+        <section className="relative">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
+            <div className="pt-32 pb-12 md:pt-40 md:pb-20">
+              <div className="max-w-3xl mx-auto text-center">
+                <h1 className="h1 font-red-hat-display mb-4">Loading Contact Form...</h1>
+              </div>
+            </div>
+          </div>
+        </section>
+      </>
+  );
+
+  return (
+    <Suspense fallback={fallbackUI}>
+      <ContactContent />
+    </Suspense>
+  );
 }
