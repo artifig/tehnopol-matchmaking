@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Modal from '@/components/utils/modal';
 import { ResponsiveContainer, RadarChart as RechartsRadarChart, PolarGrid, PolarAngleAxis, Radar, Tooltip } from 'recharts';
+import { useRouter } from "next/navigation";
 
 interface Provider {
   name: string;
@@ -15,57 +16,120 @@ interface Provider {
   contactRole: string;
 }
 
+interface Metrics {
+  [key: string]: number;
+}
+
 export default function ResultsPage() {
-  const [showMetrics, setShowMetrics] = React.useState(false);
+  const router = useRouter();
   const [selectedProvider, setSelectedProvider] = React.useState<Provider | null>(null);
   const [isMetricsModalOpen, setIsMetricsModalOpen] = React.useState(false);
+  
+  const [providers, setProviders] = useState<Provider[]>([]);
+  const [metrics, setMetrics] = useState<Metrics | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const providers = [
-    {
-      name: "Science and Business Park Tehnopol",
-      logo: "/logo/logo-Tehnopol.png",
-      shortDescription: "Expert in Business Strategy and Operations",
-      details: "We are a team of experts in business strategy and operations with vast experience in supporting startups and scaleups.",
-      contactName: "Rauno Varblas",
-      contactRole: "Head of AI and Innovation",
-      contactEmail: "rauno.varblas@tehnopol.ee",
-      contactPhone: "+372 5123 4567"
-    },
-    {
-      name: "AI & Robotics Estonia",
-      logo: "/logo/logo-AIRE.png",
-      shortDescription: "Consortia of Estonian AI and Robotics academics",
-      details: "We are flexible team of academics and support staff, ready to help you with your AI and robotics projects.",
-      contactName: "Evelin Ebruk",
-      contactRole: "Head of Client Relations",
-      contactEmail: "evelin.ebruk@aire-edih.eu",
-      contactPhone: "+372 5987 6543"
-    },
-    {
-      name: "Artifig",
-      logo: "/logo/logo-Artifig.png",
-      shortDescription: "Technical AI Solutions and Strategy",
-      details: "We are a small team of experts in AI with an academic background, and plenty of business experience. We are dedicated to providing the best possible solutions for our clients.",
-      contactName: "Otto Mättas",
-      contactRole: "AI Solutions Architect",
-      contactEmail: "otto@artifig.com",
-      contactPhone: "+372 5662 8362"
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      const responseId = localStorage.getItem('responseId');
+
+      if (!responseId) {
+        setError("Assessment session not found. Please start the assessment again.");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/assessment/fetchResults?responseId=${responseId}`);
+        const data = await res.json();
+
+        if (data.success) {
+          setMetrics(data.metrics);
+          setProviders(data.providers);
+        } else {
+          setError(data.error || "Failed to load results.");
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError("An error occurred while fetching results.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const overallScore = metrics
+    ? Math.round(
+        Object.values(metrics).reduce((sum, value) => sum + value, 0) / Object.values(metrics).length
+      )
+    : 0;
+
+  const handleDownload = () => {
+    if (!metrics || !providers) {
+      console.error("Assessment data not loaded yet.");
+      alert("Please wait for results to load before downloading.");
+      return;
     }
-  ];
-
-  const metrics = {
-    "Business Strategy": 76,
-    "Operations": 54,
-    "Growth & Marketing": 89,
-    "Digital Maturity": 65,
-    "Innovation Readiness": 72,
-    "AI & Data Capabilities": 68,
-    "Team & Skills": 81
+    try {
+      localStorage.setItem('reportMetrics', JSON.stringify(metrics));
+      localStorage.setItem('reportProviders', JSON.stringify(providers));
+      router.push('/contact?action=download');
+    } catch (error) {
+      console.error("Error storing report data:", error);
+      alert("Failed to prepare report data for download.");
+    }
   };
 
-  const overallScore = Math.round(
-    Object.values(metrics).reduce((sum, value) => sum + value, 0) / Object.values(metrics).length
-  );
+  const handleSendEmail = () => {
+    if (!metrics || !providers) {
+      console.error("Assessment data not loaded yet.");
+      alert("Please wait for results to load before emailing.");
+      return;
+    }
+     try {
+      localStorage.setItem('reportMetrics', JSON.stringify(metrics));
+      localStorage.setItem('reportProviders', JSON.stringify(providers));
+      router.push('/contact?action=email');
+    } catch (error) {
+      console.error("Error storing report data:", error);
+      alert("Failed to prepare report data for email.");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <section className="relative">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
+          <div className="pt-32 pb-12 md:pt-40 md:pb-20">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="h1 font-red-hat-display mb-4">Loading Results...</h1>
+              <p className="text-xl text-gray-600 dark:text-gray-400">Please wait while we process your assessment data.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+  
+  if (error) {
+     return (
+      <section className="relative">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 relative">
+          <div className="pt-32 pb-12 md:pt-40 md:pb-20">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="h1 font-red-hat-display mb-4 text-red-500">Error</h1>
+              <p className="text-xl text-gray-600 dark:text-gray-400">{error}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative">
@@ -83,9 +147,9 @@ export default function ResultsPage() {
           <div className="max-w-xl mx-auto w-full mb-12">
             <h2 className="text-2xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Performance Overview</h2>
             <div className="w-full h-64 mb-6">
-              <RadarChart />
+              {metrics && <RadarChart metrics={metrics} />}
             </div>
-            <MetricItem title="Overall Score" value={overallScore} />
+            {metrics && <MetricItem title="Overall Score" value={overallScore} />}
             <button 
               onClick={() => setIsMetricsModalOpen(true)} 
               className="btn text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 w-full flex items-center justify-center"
@@ -170,18 +234,14 @@ export default function ResultsPage() {
         </Modal>
       )}
 
-      {isMetricsModalOpen && (
+      {isMetricsModalOpen && metrics && (
         <Modal isOpen={true} onClose={() => setIsMetricsModalOpen(false)}>
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4">Detailed Metrics</h3>
             <div className="space-y-6">
-              <MetricItem title="Business Strategy" value={76} />
-              <MetricItem title="Operations" value={54} />
-              <MetricItem title="Growth & Marketing" value={89} />
-              <MetricItem title="Digital Maturity" value={65} />
-              <MetricItem title="Innovation Readiness" value={72} />
-              <MetricItem title="AI & Data Capabilities" value={68} />
-              <MetricItem title="Team & Skills" value={81} />
+              {Object.entries(metrics).map(([title, value]) => (
+                <MetricItem key={title} title={title} value={value} />
+              ))}
             </div>
           </div>
         </Modal>
@@ -190,16 +250,8 @@ export default function ResultsPage() {
   );
 }
 
-function RadarChart() {
-  const data = [
-    { category: "Business Strategy", value: 76 },
-    { category: "Operations", value: 54 },
-    { category: "Growth & Marketing", value: 89 },
-    { category: "Digital Maturity", value: 65 },
-    { category: "Innovation Readiness", value: 72 },
-    { category: "AI & Data Capabilities", value: 68 },
-    { category: "Team & Skills", value: 81 }
-  ];
+function RadarChart({ metrics }: { metrics: Metrics }) {
+  const data = Object.entries(metrics).map(([category, value]) => ({ category, value }));
 
   return (
     <div className="w-full h-full">
@@ -282,14 +334,4 @@ function SolutionCard({ name, logo, onLearnMore }: { name: string; logo: string;
       </div>
     </div>
   );
-}
-
-function handleDownload() {
-  // Redirect to contact page with download parameter
-  window.location.href = `/contact?action=download`;
-}
-
-function handleSendEmail() {
-  // Redirect to contact page with email parameter
-  window.location.href = `/contact?action=email`;
 }
