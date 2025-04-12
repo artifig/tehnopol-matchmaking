@@ -62,12 +62,19 @@ Tehnopol Matchmaking is a dynamic website offering a variety of pages and intera
 1.  **Goal Input:** (Implicit or external) User defines business goals.
 2.  **Start Page (`/assessment`):** User inputs `businessGoals` and selects `companyType`. An initial `AssessmentResponses` record is created in Airtable via `/api/assessment/createResponse`. This sets `responseStatus` to "New" and returns a `responseId`.
 3.  **Questions Page (`/assessment/questions`):** 
-    - Fetches relevant `MethodCategories` and associated `MethodQuestions` via `/api/assessment/fetchCategories` based on `companyType` (from `localStorage`).
-    - User answers questions.
-    - Upon completion, all answers (mapping `questionId` -> `answerText`) are sent along with `responseId` (from `localStorage`) to `/api/assessment/saveResponses`.
-    - The API saves the answers as a JSON string in the `responseContent` field and updates the `responseStatus` to "Completed" in the corresponding `AssessmentResponses` record.
+    - Fetches relevant `MethodCategories`, associated `MethodQuestions`, and linked `MethodAnswers` (with IDs) via `/api/assessment/fetchCategories` based on `companyType` (from `localStorage`).
+    - User answers questions, selecting an answer option.
+    - Upon completion, all answers are collected as a map of `{ questionRecordId: answerRecordId }`.
+    - This map is sent along with `responseId` (from `localStorage`) to `/api/assessment/saveResponses`.
+    - The API saves the ID map as a JSON string in the `responseContent` field and updates the `responseStatus` to "Completed" in the corresponding `AssessmentResponses` record.
 4.  **Results Page (`/assessment/results`):**
-    - Fetches calculated `metrics` and matched `providers` from `/api/assessment/fetchResults` using `responseId` (from `localStorage`). **(Note: This API currently returns mock data; calculation logic needs implementation).**
+    - Fetches calculated `metrics` and matched `providers` from `/api/assessment/fetchResults` using `responseId` (from `localStorage`). This API route now:
+        - Reads the `responseContent` (the ID map).
+        - Fetches `MethodAnswers` to get the score for each `answerRecordId`.
+        - Fetches `MethodQuestions` and `MethodCategories` to link questions to categories.
+        - Calculates average scores per category.
+        - Fetches `SolutionProviders` filtered by `MethodCompanyTypes`.
+        - Formats the results.
     - Displays results, including a radar chart and provider cards.
     - Stores `metrics`, `providers`, and `responseId` in `localStorage` before redirecting for report actions.
 5.  **Contact Page (`/contact?action=download` or `?action=email`):**
@@ -81,16 +88,17 @@ Tehnopol Matchmaking is a dynamic website offering a variety of pages and intera
 
 Two primary approaches exist for saving user assessment responses to Airtable:
 
-### 1. Current Approach: JSON in `responseContent` (Implemented)
+### 1. Current Approach: JSON in `responseContent` (Implemented - ID Mapping)
 
-- **Description:** All question answers for a single assessment are stored as a single JSON string within the `responseContent` field of the main `AssessmentResponses` record.
+- **Description:** All question answers for a single assessment are stored as a single JSON string within the `responseContent` field of the main `AssessmentResponses` record. The JSON represents a map of `{ questionRecordId: answerRecordId }`.
 - **API Endpoint:** `/api/assessment/saveResponses/route.ts`
 - **Pros:** 
     - Simple saving logic (single record update).
     - Keeps all responses for one assessment together.
+    - Uses record IDs for relationships, improving data integrity over storing text.
 - **Cons:**
-    - Difficult to query/analyze individual answers directly in Airtable.
-    - Requires parsing and processing the JSON string within the `/api/assessment/fetchResults` API route for metric calculation.
+    - Still difficult to query/analyze individual answers directly in Airtable without parsing.
+    - Requires parsing the JSON and additional lookups (Answer ID -> Score) in the `/api/assessment/fetchResults` API route for metric calculation.
 - **Status:** This is the currently active implementation.
 
 ### 2. Alternative Approach: Individual Answer Records (Placeholder)
@@ -107,21 +115,15 @@ Two primary approaches exist for saving user assessment responses to Airtable:
     - Potentially higher Airtable API usage and potentially slower saving process due to multiple writes (especially needing batching for >10 answers).
 - **Status:** A placeholder API route exists to demonstrate the concept, but it is not integrated into the application flow.
 
-**Current Recommendation:** Stick with the **JSON in `responseContent`** approach for now, as it aligns with the existing implementation and concentrates the processing logic in the `fetchResults` endpoint. Revisit the individual answer record approach if direct Airtable analytics on individual answers becomes a critical requirement.
+**Current Recommendation:** The current **JSON in `responseContent` (ID Mapping)** approach is a good balance. It uses IDs for consistency while keeping the saving logic relatively simple. The processing complexity is contained within the `fetchResults` endpoint. Revisit the individual answer record approach only if direct Airtable reporting on individual answers becomes critical.
 
 ## Future Development & TODOs
 
-- **Implement `fetchResults` Logic:** Complete the core logic in `/api/assessment/fetchResults/route.ts` to:
-    - Fetch and parse actual assessment data from Airtable.
-    - Fetch scoring information from `MethodAnswers`.
-    - Fetch question categories from `MethodQuestions`.
-    - Calculate category scores based on responses.
-    - Fetch provider data and implement matching logic (based on company type, categories, scores/maturity levels).
-    - Handle extraction of attachment URLs (e.g., `providerLogo`).
 - **Implement Email Report:** Create an API endpoint and integrate a service (e.g., SendGrid, Resend) to actually email the generated PDF report.
-- **Refine Provider Matching Algorithm:** Improve the logic for matching solution providers based on assessment results.
+- **Refine Provider Matching Algorithm:** The `/api/assessment/fetchResults` currently only filters providers by `MethodCompanyTypes`. Enhance this logic to potentially rank or filter providers based on calculated category scores (`metrics`) or links to `MethodCategories` / `MethodMaturityLevels`.
 - **Expand Questionnaire:** Add more questions and potentially refine categories.
 - **Enhance UI/UX:** Improve the visual presentation and user experience based on testing and feedback.
+- **Error Handling:** Add more robust error handling and user feedback, especially for API call failures (e.g., in `questions/page.tsx` when saving responses, or in `contact/page.tsx` when updating info).
 - **Consider Individual Answer Saving:** Evaluate if the benefits of saving individual answers (as outlined in the placeholder) outweigh the complexity for future analytics needs.
 
 ## License

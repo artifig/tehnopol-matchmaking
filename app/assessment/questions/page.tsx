@@ -3,31 +3,39 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
-// Update the types at the top
-type Category = {
+// Update the types at the top to match the new API response
+interface AnswerOption {
+  id: string; // Answer Record ID
+  text: string; // Answer Text
+}
+
+interface Question {
+  id: string; // Question Record ID
+  questionText_en: string;
+  category: string; // Added category text back for display/navigation logic
+  answers: AnswerOption[];
+}
+
+interface Category {
   id: string;
   categoryText_en: string;
   categoryDescription_en: string;
-};
+  questions: Question[];
+}
 
-type Question = {
-  id: string;
-  questionText_en: string;
-  category: string;
-};
-
-// Options for answers
-const options = ["Never", "Occasionally", "Often", "Always"];
+// Removed old Question/Category types
+// Removed hardcoded options array
 
 export default function AssessmentQuestions() {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [responses, setResponses] = useState<Record<string, string>>({});
+  // Responses state now stores QuestionID -> AnswerID
+  const [responses, setResponses] = useState<Record<string, string>>({}); 
   const [categories, setCategories] = useState<Category[]>([]);
-  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
+  const [allQuestions, setAllQuestions] = useState<Question[]>([]); // Now holds Question objects with answers
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const currentQuestion = allQuestions[currentIndex];
+  const currentQuestion = useMemo(() => allQuestions[currentIndex], [allQuestions, currentIndex]); // Memoize current question
 
   // Compute starting index for each category
   const categoryStarts = useMemo<Record<string, number>>(() => {
@@ -41,47 +49,55 @@ export default function AssessmentQuestions() {
     return mapping;
   }, [allQuestions]);
 
-  // Fetch categories and generate questions
+  // Fetch categories and questions (with answers) from the updated API
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchAssessmentData = async () => {
       setIsLoading(true);
       const selectedCompanyType = localStorage.getItem('selectedCompanyType');
       if (!selectedCompanyType) {
         console.error('No company type selected');
         setIsLoading(false);
+        // TODO: Redirect or show error message
         return;
       }
       try {
         const response = await fetch(`/api/assessment/fetchCategories?companyType=${selectedCompanyType}`);
         const data = await response.json();
         if (data.success) {
-          // Use categories directly from Airtable with nested questions
-          setCategories(data.categories);
-          // Extract questions from each category and attach the category text
-          const questions = data.categories.flatMap((category: Category & { questions: any[] }) =>
-            (category.questions || []).map((q: any) => ({ ...q, category: category.categoryText_en }))
+          const fetchedCategories: Category[] = data.categories;
+          setCategories(fetchedCategories);
+          
+          // Extract questions, adding category text back for navigation logic
+          const questionsWithCategoryText = fetchedCategories.flatMap(category =>
+            category.questions.map(q => ({ ...q, category: category.categoryText_en }))
           );
-          setAllQuestions(questions);
-          setTotalQuestions(questions.length);
+          setAllQuestions(questionsWithCategoryText);
+          setTotalQuestions(questionsWithCategoryText.length);
+
         } else {
-          console.error('Error fetching categories:', data.error);
+          console.error('Error fetching assessment data:', data.error);
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error('Error fetching assessment data:', error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchCategories();
+    fetchAssessmentData();
   }, []);
 
   const handleCategorySelect = (startIndex: number) => {
     setCurrentIndex(startIndex);
   };
 
-  const handleAnswerClick = async (value: string) => {
-    const newResponses = { ...responses, [currentQuestion.id]: value };
+  // Update handleAnswerClick to store the ANSWER RECORD ID
+  const handleAnswerClick = async (answerId: string) => {
+    if (!currentQuestion) return;
+    // Store Question Record ID -> Answer Record ID
+    const newResponses = { ...responses, [currentQuestion.id]: answerId }; 
     setResponses(newResponses);
+
+    // Save logic remains mostly the same, but sends the new responses format
     if (currentIndex < totalQuestions - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
@@ -89,22 +105,29 @@ export default function AssessmentQuestions() {
       const responseId = localStorage.getItem('responseId');
       if (!responseId) {
         console.error('Response ID not found in localStorage');
+        // TODO: Handle error - maybe redirect?
       } else {
         try {
+          console.log("Submitting responses:", newResponses); // Log the new format
           const saveResponse = await fetch('/api/assessment/saveResponses', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ responseId, responses: newResponses })
+            body: JSON.stringify({ responseId, responses: newResponses }) // Send new format
           });
           const saveData = await saveResponse.json();
           if (!saveData.success) {
             console.error('Error saving responses:', saveData.error);
+            // TODO: Handle save error - show message?
+          } else {
+            // Only navigate if save was successful
+            router.push('/assessment/results');
           }
         } catch (error) {
-          console.error('Error saving responses:', error);
+          console.error('Error submitting responses:', error);
+           // TODO: Handle fetch error - show message?
         }
       }
-      router.push('/assessment/results');
+      // Removed navigation from here - happens only on successful save
     }
   };
 
@@ -219,18 +242,20 @@ export default function AssessmentQuestions() {
                 {currentQuestion.questionText_en}
               </p>
               <div className="flex flex-col space-y-4 mb-8">
-                {options.map((option) => (
+                {/* Map over the answers fetched for the current question */} 
+                {currentQuestion.answers.map((answerOption) => (
                   <button
-                    key={option}
+                    key={answerOption.id} // Use Answer Record ID as key
                     type="button"
-                    onClick={() => handleAnswerClick(option)}
+                    onClick={() => handleAnswerClick(answerOption.id)} // Pass Answer Record ID
                     className={`btn flex items-center justify-center px-6 py-3 ${
-                      responses[currentQuestion.id] === option
+                      // Check if the stored response for this question is this answer's ID
+                      responses[currentQuestion.id] === answerOption.id 
                         ? "text-white bg-orange-500 hover:bg-orange-400"
                         : "text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
                     }`}
                   >
-                    {option}
+                    {answerOption.text} {/* Display Answer Text */}
                   </button>
                 ))}
               </div>

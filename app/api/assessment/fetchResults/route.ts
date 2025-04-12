@@ -21,11 +21,11 @@ interface AirtableRecord {
 }
 
 interface ParsedResponses {
-  [questionId: string]: string; // questionId -> answerText_en
+  [questionRecordId: string]: string; // questionRecordId -> answerRecordId
 }
 
 interface AnswerScoreMap {
-  [answerText: string]: number; // answerText_en -> answerScore
+  [answerRecordId: string]: number; // answerRecordId -> answerScore
 }
 
 interface QuestionCategoryMap {
@@ -48,7 +48,6 @@ interface FormattedProvider {
   contactName: string;
   contactEmail: string;
   contactPhone: string;
-  contactRole: string;
 }
 
 // Helper function to safely get attachment URL
@@ -94,7 +93,7 @@ export async function GET(request: NextRequest) {
     }
     const companyTypeId = linkedCompanyTypeIds[0]; // Assuming single link for now
 
-    // --- 2. Parse Response Content ---
+    // --- 2. Parse Response Content (QuestionID -> AnswerID map) ---
     let parsedResponses: ParsedResponses;
     try {
       parsedResponses = JSON.parse(responseContentString);
@@ -103,12 +102,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Corrupted assessment data found' }, { status: 500 });
     }
 
-    // --- 3. Fetch MethodAnswers (Scoring Map) ---
-    const answerRecords = await base(TBL_ANSWERS).select({ fields: ['answerText_en', 'answerScore'] }).all();
+    // --- 3. Fetch MethodAnswers (Scoring Map: AnswerRecordID -> Score) ---
+    // Fetch only the answers relevant to this assessment if possible,
+    // otherwise fetch all and build map.
+    // For simplicity here, fetching all.
+    const answerRecords = await base(TBL_ANSWERS).select({ fields: ['answerScore'] }).all(); // Only need score
     const answerScoreMap: AnswerScoreMap = {};
     answerRecords.forEach(record => {
-      if (record.fields.answerText_en && typeof record.fields.answerScore === 'number') {
-        answerScoreMap[record.fields.answerText_en as string] = record.fields.answerScore;
+      // Map Answer Record ID to its score
+      if (typeof record.fields.answerScore === 'number') {
+        answerScoreMap[record.id] = record.fields.answerScore;
       }
     });
 
@@ -133,12 +136,12 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // --- 5. Calculate Metrics ---
+    // --- 5. Calculate Metrics (Using Answer IDs) ---
     const categoryScores: CategoryScores = {};
     for (const questionId in parsedResponses) {
-      const answerText = parsedResponses[questionId];
+      const answerId = parsedResponses[questionId]; // This is now Answer Record ID
       const categoryName = questionCategoryMap[questionId];
-      const score = answerScoreMap[answerText];
+      const score = answerScoreMap[answerId]; // Get score using Answer Record ID
 
       if (categoryName !== undefined && score !== undefined) {
         if (!categoryScores[categoryName]) {
@@ -147,14 +150,15 @@ export async function GET(request: NextRequest) {
         categoryScores[categoryName].sum += score;
         categoryScores[categoryName].count += 1;
       } else {
-        console.warn(`Missing category or score for questionId: ${questionId}, answer: ${answerText}`);
+        // More specific warning
+        console.warn(`Missing category for questionId: ${questionId} OR score for answerId: ${answerId}`);
       }
     }
 
     const calculatedMetrics: CalculatedMetrics = {};
     for (const categoryName in categoryScores) {
       const { sum, count } = categoryScores[categoryName];
-      calculatedMetrics[categoryName] = count > 0 ? Math.round((sum / count)) : 0; // Calculate average, handle division by zero
+      calculatedMetrics[categoryName] = count > 0 ? Math.round((sum / count)) : 0;
     }
 
     // --- 6. Fetch and Filter Solution Providers ---
@@ -168,9 +172,7 @@ export async function GET(request: NextRequest) {
           'providerDescription_en',
           'providerContactName',
           'providerContactEmail',
-          'providerContactPhone',
-          // Add any other fields needed for display or more complex matching later
-          // e.g., MethodCategories, MethodMaturityLevels
+          'providerContactPhone'
         ]
       })
       .all();
@@ -179,12 +181,11 @@ export async function GET(request: NextRequest) {
     const formattedProviders: FormattedProvider[] = providerRecords.map(record => ({
       name: record.fields.providerName_en as string || 'N/A',
       logo: getLogoUrl(record.fields.providerLogo), // Use helper to get URL
-      shortDescription: (record.fields.providerDescription_en as string || 'No description available.').substring(0, 100) + '...', // Example: Use full description or create a dedicated short desc field
+      shortDescription: (record.fields.providerDescription_en as string || 'No description available.').substring(0, 100) + '...',
       details: record.fields.providerDescription_en as string || 'No details available.',
       contactName: record.fields.providerContactName as string || 'N/A',
       contactEmail: record.fields.providerContactEmail as string || 'N/A',
-      contactPhone: record.fields.providerContactPhone as string || 'N/A',
-      contactRole: record.fields.providerContactRole as string || 'N/A' // Assuming contactRole exists
+      contactPhone: record.fields.providerContactPhone as string || 'N/A'
     }));
 
     // --- 8. Return Response ---

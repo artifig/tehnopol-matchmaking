@@ -6,6 +6,25 @@ const baseAirtable = new Airtable({
   apiKey: process.env.AIRTABLE_PERSONAL_ACCESS_TOKEN || ''
 }).base(process.env.AIRTABLE_BASE_ID || '');
 
+// Define types for clarity
+interface AnswerOption {
+  id: string; // MethodAnswers Record ID
+  text: string; // answerText_en
+}
+
+interface Question {
+  id: string; // MethodQuestions Record ID
+  questionText_en: string;
+  answers: AnswerOption[]; // Add possible answers
+}
+
+interface Category {
+  id: string; // MethodCategories Record ID
+  categoryText_en: string;
+  categoryDescription_en: string;
+  questions: Question[]; // Embed full questions with answers
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -44,7 +63,8 @@ export async function GET(request: Request) {
     }
     // Extract the linked MethodCategories field (an array of record ids)
     const companyTypeRecord = companyTypeRecords[0];
-    const linkedCategories = companyTypeRecord.fields.MethodCategories as string[];
+    // Use explicit any cast for linked field access
+    const linkedCategories = (companyTypeRecord.fields as any).MethodCategories as string[];
     if (!linkedCategories || linkedCategories.length === 0) {
       return NextResponse.json(
         { success: false, error: 'No linked categories found for this company type' },
@@ -60,50 +80,80 @@ export async function GET(request: Request) {
     const categoryRecords = await baseAirtable('MethodCategories')
       .select({ 
         filterByFormula: filterFormula,
+        fields: ['categoryText_en', 'categoryDescription_en', 'MethodQuestions'], // Specify fields
         sort: [{ field: 'categoryId', direction: 'asc' }]
       })
-      .firstPage();
+      .all(); // Use .all() to get all relevant categories
 
-    // Map each category to include linked question IDs with explicit type cast and filtering
-    const categoriesWithQuestionsIds = categoryRecords.map(record => ({
-      id: record.id,
-      categoryText_en: record.fields.categoryText_en,
-      categoryDescription_en: record.fields.categoryDescription_en,
-      methodQuestions: Array.isArray(record.fields.MethodQuestions) ? record.fields.MethodQuestions.filter((item): item is string => typeof item === 'string') : []
-    }));
+    // --- Prepare to fetch Questions and Answers --- 
+    const allQuestionIds = Array.from(new Set(categoryRecords.flatMap(cat => (cat.fields as any).MethodQuestions || []))) as string[];
+    let questionsMap: Map<string, Question> = new Map();
+    let answersMap: Map<string, AnswerOption[]> = new Map(); // questionId -> AnswerOption[]
 
-    // Gather unique question IDs from all categories
-    const allQuestionIds = Array.from(new Set(categoriesWithQuestionsIds.flatMap(cat => cat.methodQuestions)));
+    // --- Fetch MethodAnswers First (to link them to questions later) ---
+    // Assuming a reasonable number of total answer options; otherwise, filter by linked questions
+    const answerOptionRecords = await baseAirtable('MethodAnswers')
+      .select({ fields: ['answerText_en', 'MethodQuestions'] }) // Need linked question IDs
+      .all();
+      
+    // Build a map of questionId -> array of its AnswerOptions
+    answerOptionRecords.forEach(ansRec => {
+      // Use explicit any cast for linked field access
+      const questionIds = (ansRec.fields as any).MethodQuestions as string[] | undefined;
+      // Ensure answerText_en is treated as a string
+      const answerText = typeof ansRec.fields.answerText_en === 'string' ? ansRec.fields.answerText_en : ''; 
+      if (questionIds && questionIds.length > 0 && answerText) { // Ensure answerText is valid
+        const answerOption: AnswerOption = {
+          id: ansRec.id,
+          text: answerText // Use validated answerText
+        };
+        questionIds.forEach(qId => {
+          if (!answersMap.has(qId)) {
+            answersMap.set(qId, []);
+          }
+          answersMap.get(qId)!.push(answerOption);
+        });
+      }
+    });
 
-    // Initialize questions mapping with proper type
-    let questionsMapping: Record<string, { id: string; questionText_en: string }> = {};
+    // --- Fetch MethodQuestions --- 
     if (allQuestionIds.length > 0) {
-      const orConditionsQ = allQuestionIds.map(id => `RECORD_ID() = "${id}"`).join(', ');
-      const filterFormulaQ = `OR(${orConditionsQ})`;
+      const questionFilterFormula = `OR(${allQuestionIds.map(id => `RECORD_ID() = "${id}"`).join(', ')})`;
       const questionRecords = await baseAirtable('MethodQuestions')
         .select({
-          filterByFormula: filterFormulaQ,
+          filterByFormula: questionFilterFormula,
+          fields: ['questionText_en'], // Only need text now
           sort: [{ field: 'questionId', direction: 'asc' }]
         })
-        .firstPage();
-      questionsMapping = questionRecords.reduce((acc, record) => {
-        acc[record.id] = {
-          id: record.id,
-          questionText_en: typeof record.fields.questionText_en === 'string' ? record.fields.questionText_en : ''
-        };
-        return acc;
-      }, {} as Record<string, { id: string; questionText_en: string }>);
+        .all();
+        
+      // Populate questionsMap, attaching the pre-fetched answers
+      questionRecords.forEach(qRec => {
+        // Ensure questionText_en is treated as a string
+        const questionText = typeof qRec.fields.questionText_en === 'string' ? qRec.fields.questionText_en : '';
+        questionsMap.set(qRec.id, {
+          id: qRec.id,
+          questionText_en: questionText, // Use validated questionText
+          answers: answersMap.get(qRec.id) || [] // Get answers from the map
+        });
+      });
     }
 
-    // Attach fetched questions to each category
-    const categoriesWithQuestions = categoriesWithQuestionsIds.map(cat => ({
-      ...cat,
-      questions: (cat.methodQuestions as string[])
-        .map((qid: string) => questionsMapping[qid])
-        .filter((q) => q !== undefined)
-    }));
+    // --- Combine data into the final structure --- 
+    const categoriesWithData: Category[] = categoryRecords.map(catRec => {
+      // Use explicit any cast for linked field access
+      const questionIds = (catRec.fields as any).MethodQuestions as string[] || [];
+      return {
+        id: catRec.id,
+        categoryText_en: typeof catRec.fields.categoryText_en === 'string' ? catRec.fields.categoryText_en : '', // Add type check
+        categoryDescription_en: typeof catRec.fields.categoryDescription_en === 'string' ? catRec.fields.categoryDescription_en : '', // Add type check
+        questions: questionIds
+          .map(qid => questionsMap.get(qid)) // Get full question object from map
+          .filter((q): q is Question => q !== undefined) // Type guard and filter undefined
+      };
+    });
 
-    return NextResponse.json({ success: true, categories: categoriesWithQuestions });
+    return NextResponse.json({ success: true, categories: categoriesWithData });
   } catch (error: any) {
     console.error('Error fetching assessment categories:', error);
     return NextResponse.json(
