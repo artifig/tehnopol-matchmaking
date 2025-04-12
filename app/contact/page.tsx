@@ -30,12 +30,14 @@ export default function Contact() {
   const searchParams = useSearchParams();
   const action = searchParams.get('action'); // Get action from URL
 
-  // State for report data, loading, and errors
+  // State for report data, loading, errors, and responseId
   const [metrics, setMetrics] = useState<Metric[] | null>(null);
   const [providers, setProviders] = useState<Provider[] | null>(null);
   const [overallScore, setOverallScore] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [responseId, setResponseId] = useState<string | null>(null); // Added state for responseId
+  const [isSubmitting, setIsSubmitting] = useState(false); // Added state for submission status
 
   // Effect to load data from localStorage
   useEffect(() => {
@@ -44,10 +46,13 @@ export default function Contact() {
     try {
       const storedMetricsString = localStorage.getItem('reportMetrics');
       const storedProvidersString = localStorage.getItem('reportProviders');
+      const storedResponseId = localStorage.getItem('reportResponseId'); // Get responseId
 
-      if (!storedMetricsString || !storedProvidersString) {
+      if (!storedMetricsString || !storedProvidersString || !storedResponseId) { // Check for responseId
         throw new Error("Assessment data not found. Please return to the results page and try again.");
       }
+      
+      setResponseId(storedResponseId); // Set responseId state
 
       const parsedMetrics = JSON.parse(storedMetricsString);
       const parsedProviders = JSON.parse(storedProvidersString);
@@ -72,33 +77,123 @@ export default function Contact() {
     }
   }, []); // Empty dependency array means this runs once on mount
 
+  // --- Helper function to call the new update API ---
+  // Expects contactData object with keys matching Airtable fields
+  const updateContactInfo = async (contactData: Record<string, any>) => { 
+    if (!responseId) {
+        console.error("Response ID not found, cannot update contact info.");
+        return false; // Indicate failure
+    }
+    try {
+        // Payload now directly includes responseId and the contactData (keys already match Airtable fields)
+        const payload = { 
+            responseId, 
+            ...contactData // Spread the contactData with Airtable field names
+        };
+        // Optional: Filter out any undefined values if necessary before sending
+        // const filteredPayload = Object.entries(payload).reduce((acc, [key, value]) => {
+        //     if (value !== undefined) acc[key] = value;
+        //     return acc;
+        // }, {} as Record<string, any>);
+
+        const apiResponse = await fetch('/api/assessment/updateContactInfo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload), // Send the payload
+        });
+        const result = await apiResponse.json();
+        if (!result.success) {
+            console.error("API Error updating contact info:", result.error);
+            alert(`Failed to save contact information: ${result.error}`);
+            return false; // Indicate failure
+        }
+        console.log("Contact info successfully saved.");
+        return true; // Indicate success
+    } catch (err) {
+        console.error("Network/fetch error updating contact info:", err);
+        alert("An error occurred while saving your contact information. Please try again.");
+        return false; // Indicate failure
+    }
+};
+
   // Function to handle download click
   const handleDownloadClick = async () => {
-    if (!formRef.current || !metrics || !providers) return;
+    if (!formRef.current || !metrics || !providers || isSubmitting) return;
     if (!formRef.current.reportValidity()) return; // trigger HTML validation
 
+    setIsSubmitting(true); // Disable button
+
     const formData = new FormData(formRef.current);
-    const userInfo = {
-      firstName: formData.get('firstName') as string,
-      lastName: formData.get('lastName') as string,
-      company: formData.get('company') as string,
-      email: formData.get('email') as string,
+    // Gather form data using Airtable field names (matching NEW form field names)
+    const contactData: Record<string, any> = {
+      contactFirstName: formData.get('contactFirstName') as string,
+      contactLastName: formData.get('contactLastName') as string,
+      contactEmail: formData.get('contactEmail') as string,
+      contactPhoneNumber: formData.get('contactPhoneNumber') as string,
+      contactCompanyName: formData.get('contactCompanyName') as string,
+      contactCompanyRegistrationNumber: formData.get('contactCompanyRegistrationNumber') as string || undefined,
+      contactCountry: formData.get('contactCountry') as string,
     };
-    console.log('Download button clicked with:', userInfo);
-    // Call the internal handleDownload with fetched data
-    await handleDownload(userInfo, metrics, overallScore, providers);
+    // Remove undefined registration number if empty
+    if (contactData.contactCompanyRegistrationNumber === undefined) {
+        delete contactData.contactCompanyRegistrationNumber;
+    }
+    console.log('Download button clicked with (Airtable keys):', contactData);
+    
+    // --> 1. Save contact info (updateContactInfo expects object with Airtable keys)
+    const saveSuccess = await updateContactInfo(contactData);
+
+    // --> 2. Proceed with download only if save was successful
+    if (saveSuccess) {
+        // Pass userInfo for the PDF report itself, mapping back to simpler names if needed by generator
+        const reportUserInfo = { 
+            firstName: contactData.contactFirstName, 
+            lastName: contactData.contactLastName, 
+            company: contactData.contactCompanyName, 
+            email: contactData.contactEmail 
+        };
+        await handleDownload(reportUserInfo, metrics, overallScore, providers);
+    } else {
+        console.log("Contact info save failed, download aborted.");
+    }
+    setIsSubmitting(false); // Re-enable button
   };
 
   // Function to handle email click
-  const handleEmailClick = () => {
-    if (!formRef.current || !metrics || !providers) return;
+  const handleEmailClick = async () => {
+    if (!formRef.current || !metrics || !providers || isSubmitting) return;
     if (!formRef.current.reportValidity()) return; // trigger HTML validation
 
+    setIsSubmitting(true); // Disable button
+
     const formData = new FormData(formRef.current);
-    const email = formData.get('email') as string;
-    console.log('Email button clicked with email:', email);
-    // Call the internal handleEmail with fetched data
-    handleEmail(email, metrics, overallScore, providers);
+    // Gather form data using Airtable field names (matching NEW form field names)
+    const contactData: Record<string, any> = { 
+      contactFirstName: formData.get('contactFirstName') as string,
+      contactLastName: formData.get('contactLastName') as string,
+      contactEmail: formData.get('contactEmail') as string,
+      contactPhoneNumber: formData.get('contactPhoneNumber') as string,
+      contactCompanyName: formData.get('contactCompanyName') as string,
+      contactCompanyRegistrationNumber: formData.get('contactCompanyRegistrationNumber') as string || undefined,
+      contactCountry: formData.get('contactCountry') as string,
+    };
+     // Remove undefined registration number if empty
+    if (contactData.contactCompanyRegistrationNumber === undefined) {
+        delete contactData.contactCompanyRegistrationNumber;
+    }
+    const email = contactData.contactEmail;
+    console.log('Email button clicked with (Airtable keys):', contactData);
+
+    // --> 1. Save contact info (updateContactInfo expects object with Airtable keys)
+    const saveSuccess = await updateContactInfo(contactData);
+
+    // --> 2. Proceed with email only if save was successful
+    if (saveSuccess) {
+        handleEmail(email, metrics, overallScore, providers);
+    } else {
+        console.log("Contact info save failed, email aborted.");
+    }
+    setIsSubmitting(false); // Re-enable button
   };
 
   // Internal function to initiate download (now receives data as args)
@@ -193,40 +288,52 @@ export default function Contact() {
               </p>
             </div>
 
-            {/* Contact form */}
+            {/* Contact form - REORDERED and field names updated */}
             <form className="max-w-xl mx-auto" ref={formRef}>
+              {/* First Name / Last Name Row */}
               <div className="flex flex-wrap -mx-3 mb-5">
                 <div className="w-full md:w-1/2 px-3 mb-4 md:mb-0">
-                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="first-name">First Name <span className="text-red-600">*</span></label>
-                  <input id="first-name" name="firstName" type="text" className="form-input w-full" placeholder="Enter your first name" required />
+                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="contactFirstName">First Name <span className="text-red-600">*</span></label>
+                  <input id="contactFirstName" name="contactFirstName" type="text" className="form-input w-full" placeholder="Enter your first name" required />
                 </div>
                 <div className="w-full md:w-1/2 px-3">
-                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="last-name">Last Name <span className="text-red-600">*</span></label>
-                  <input id="last-name" name="lastName" type="text" className="form-input w-full" placeholder="Enter your last name" required />
+                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="contactLastName">Last Name <span className="text-red-600">*</span></label>
+                  <input id="contactLastName" name="contactLastName" type="text" className="form-input w-full" placeholder="Enter your last name" required />
                 </div>
               </div>
+              {/* Email Row */}
               <div className="flex flex-wrap -mx-3 mb-5">
                 <div className="w-full px-3">
-                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="email">Email <span className="text-red-600">*</span></label>
-                  <input id="email" name="email" type="email" className="form-input w-full" placeholder="Enter your email address" required />
+                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="contactEmail">Email <span className="text-red-600">*</span></label>
+                  <input id="contactEmail" name="contactEmail" type="email" className="form-input w-full" placeholder="Enter your email address" required />
                 </div>
               </div>
+              {/* Phone Number Row */}
               <div className="flex flex-wrap -mx-3 mb-5">
                 <div className="w-full px-3">
-                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="company">Company <span className="text-red-600">*</span></label>
-                  <input id="company" name="company" type="text" className="form-input w-full" placeholder="Enter your company name" required />
+                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="contactPhoneNumber">Phone Number <span className="text-red-600">*</span></label>
+                  <input id="contactPhoneNumber" name="contactPhoneNumber" type="tel" className="form-input w-full" placeholder="Enter your phone number" required />
                 </div>
               </div>
+              {/* Company Name Row */}
               <div className="flex flex-wrap -mx-3 mb-5">
                 <div className="w-full px-3">
-                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="phone">Phone Number <span className="text-red-600">*</span></label>
-                  <input id="phone" name="phone" type="tel" className="form-input w-full" placeholder="Enter your phone number" required />
+                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="contactCompanyName">Company <span className="text-red-600">*</span></label>
+                  <input id="contactCompanyName" name="contactCompanyName" type="text" className="form-input w-full" placeholder="Enter your company name" required />
                 </div>
               </div>
+              {/* Company Registration Number Row */}
               <div className="flex flex-wrap -mx-3 mb-5">
                 <div className="w-full px-3">
-                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="country">Country <span className="text-red-600">*</span></label>
-                  <select id="country" name="country" className="form-select w-full" required>
+                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="contactCompanyRegistrationNumber">Company Registration Number (Optional)</label>
+                  <input id="contactCompanyRegistrationNumber" name="contactCompanyRegistrationNumber" type="text" className="form-input w-full" placeholder="Enter company registration number" />
+                </div>
+              </div>
+              {/* Country Row */}
+              <div className="flex flex-wrap -mx-3 mb-5">
+                <div className="w-full px-3">
+                  <label className="block text-gray-800 dark:text-gray-300 text-sm font-medium mb-1" htmlFor="contactCountry">Country <span className="text-red-600">*</span></label>
+                  <select id="contactCountry" name="contactCountry" className="form-select w-full" required>
                     <option>Estonia</option>
                     <option>Other</option>
                   </select>
@@ -240,9 +347,12 @@ export default function Contact() {
                       <button
                         type="button"
                         onClick={handleDownloadClick}
-                        className="btn text-white bg-orange-500 hover:bg-orange-400 w-full sm:w-auto flex items-center justify-center px-6 py-3"
+                        className={`btn text-white bg-orange-500 hover:bg-orange-400 w-full sm:w-auto flex items-center justify-center px-6 py-3 ${
+                          isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                        disabled={isSubmitting}
                       >
-                        <span>Download Report</span>
+                        <span>{isSubmitting ? 'Processing...' : 'Download Report'}</span>
                         <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                           <path className="fill-current" d="M6 8.825L11.4 3.425L10.675 2.7L6.75 6.625V0H5.25V6.625L1.325 2.7L0.6 3.425L6 8.825ZM0.75 12H11.25V10.5H0.75V12Z" />
                         </svg>
@@ -253,9 +363,12 @@ export default function Contact() {
                       <button
                         type="button"
                         onClick={handleEmailClick}
-                        className="btn text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 w-full sm:w-auto flex items-center justify-center px-6 py-3"
+                        className={`btn text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 w-full sm:w-auto flex items-center justify-center px-6 py-3 ${
+                          isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                        disabled={isSubmitting}
                       >
-                        <span>Email Report</span>
+                        <span>{isSubmitting ? 'Processing...' : 'Email Report'}</span>
                         <svg className="w-3 h-3 shrink-0 mt-px ml-2" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                           <path className="fill-current" d="M10.5 0H1.5C0.675 0 0 0.675 0 1.5V10.5C0 11.325 0.675 12 1.5 12H10.5C11.325 12 12 11.325 12 10.5V1.5C12 0.675 11.325 0 10.5 0ZM10.5 3L6 6.75L1.5 3V1.5L6 5.25L10.5 1.5V3Z" />
                         </svg>

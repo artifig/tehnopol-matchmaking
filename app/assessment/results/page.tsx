@@ -70,14 +70,16 @@ export default function ResultsPage() {
     : 0;
 
   const handleDownload = () => {
-    if (!metrics || !providers) {
-      console.error("Assessment data not loaded yet.");
+    const responseId = localStorage.getItem('responseId');
+    if (!metrics || !providers || !responseId) {
+      console.error("Assessment data or responseId not loaded yet.");
       alert("Please wait for results to load before downloading.");
       return;
     }
     try {
       localStorage.setItem('reportMetrics', JSON.stringify(metrics));
       localStorage.setItem('reportProviders', JSON.stringify(providers));
+      localStorage.setItem('reportResponseId', responseId);
       router.push('/contact?action=download');
     } catch (error) {
       console.error("Error storing report data:", error);
@@ -86,14 +88,16 @@ export default function ResultsPage() {
   };
 
   const handleSendEmail = () => {
-    if (!metrics || !providers) {
-      console.error("Assessment data not loaded yet.");
+    const responseId = localStorage.getItem('responseId');
+    if (!metrics || !providers || !responseId) {
+      console.error("Assessment data or responseId not loaded yet.");
       alert("Please wait for results to load before emailing.");
       return;
     }
      try {
       localStorage.setItem('reportMetrics', JSON.stringify(metrics));
       localStorage.setItem('reportProviders', JSON.stringify(providers));
+      localStorage.setItem('reportResponseId', responseId);
       router.push('/contact?action=email');
     } catch (error) {
       console.error("Error storing report data:", error);
