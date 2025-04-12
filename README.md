@@ -5,15 +5,20 @@ Tehnopol Matchmaking is a dynamic website offering a variety of pages and intera
 ## Project Overview
 
 - **Multiple Pages:** The project features a wide range of pages including static pages like About, Contact, and Blog, as well as dynamic content sections created with reusable components.
-- **Self-Assessments:** The main purpose of the app is to provide users with self-assessments. This functionality is housed in the `/app/assessment` directory.
-- **Airtable Integration:** Business logic and self-assessment data are managed through Airtable. Our backend logic is designed to pull content directly from Airtable using our API integration in `/lib/airtable.ts`. (Note: Some parts of this integration remain undefined as we incrementally implement this feature.)
+- **Self-Assessments:** The main purpose of the app is to provide users with self-assessments. This functionality is housed in the `/app/assessment` directory. The flow involves users stating their goals, selecting a company type, answering categorized questions, and receiving results with matched solution providers.
+- **Airtable Integration:** Business logic and self-assessment data (questions, categories, answers, responses, providers) are managed through Airtable. The backend API routes (`/app/api/assessment/*`) interact with Airtable via helper functions (likely in `/lib/airtable.ts`).
+- **PDF Report Generation:** Users can download a PDF report of their assessment results after providing contact information on the `/contact` page. Report generation happens client-side using `@react-pdf/renderer`.
 
 ## Directory Structure
 
-- `/app`: Contains the main pages and the self-assessment tool (`/app/assessment`).
-- `/components`: Reusable components that drive the UI.
-- `/lib`: Utilities and API integrations (including Airtable connection logic).
-- `/scripts`: Supplementary scripts for automation and testing.
+- `/app`: Contains the main Next.js pages and route handlers.
+  - `/app/assessment`: Contains the pages for the multi-step assessment flow (`/`, `/questions`, `/results`).
+  - `/app/api/assessment`: Contains backend API routes for interacting with Airtable (fetching questions/categories, creating/saving responses, fetching results).
+  - `/app/contact`: Contact page used for report download/email gating.
+- `/components`: Reusable React components for UI elements, including specific assessment components and the PDF report generator (`/components/utils/generate-report.tsx`).
+- `/lib`: Utilities and shared logic, potentially including the Airtable client setup (`/lib/airtable.ts`).
+- `/public`: Static assets like images and logos.
+- `/content`: Content files (e.g., blog posts).
 
 ## Getting Started
 
@@ -52,6 +57,25 @@ Tehnopol Matchmaking is a dynamic website offering a variety of pages and intera
      yarn build
      ```
 
+## Assessment Workflow
+
+1.  **Goal Input:** (Implicit or external) User defines business goals.
+2.  **Start Page (`/assessment`):** User inputs `businessGoals` and selects `companyType`. An initial `AssessmentResponses` record is created in Airtable via `/api/assessment/createResponse`, returning a `responseId`.
+3.  **Questions Page (`/assessment/questions`):** 
+    - Fetches relevant `MethodCategories` and associated `MethodQuestions` via `/api/assessment/fetchCategories` based on `companyType` (from `localStorage`).
+    - User answers questions.
+    - Upon completion, all answers (mapping `questionId` -> `answerText`) are sent along with `responseId` (from `localStorage`) to `/api/assessment/saveResponses`.
+    - The API saves the answers as a JSON string in the `responseContent` field of the corresponding `AssessmentResponses` record.
+4.  **Results Page (`/assessment/results`):**
+    - Fetches calculated `metrics` and matched `providers` from `/api/assessment/fetchResults` using `responseId` (from `localStorage`). **(Note: This API currently returns mock data; calculation logic needs implementation).**
+    - Displays results, including a radar chart and provider cards.
+    - Stores `metrics` and `providers` in `localStorage` before redirecting for report actions.
+5.  **Contact Page (`/contact?action=download` or `?action=email`):**
+    - Retrieves `metrics` and `providers` from `localStorage`.
+    - User enters contact details.
+    - **Download:** If `action=download`, clicking the button triggers client-side PDF generation (`@react-pdf/renderer`) using the retrieved data and user info, then initiates a download.
+    - **Email:** If `action=email`, clicking the button currently shows a simulation alert. (Requires implementation of an email sending mechanism, likely via another API call).
+
 ## Airtable Data Saving Strategy
 
 Two primary approaches exist for saving user assessment responses to Airtable:
@@ -84,11 +108,20 @@ Two primary approaches exist for saving user assessment responses to Airtable:
 
 **Current Recommendation:** Stick with the **JSON in `responseContent`** approach for now, as it aligns with the existing implementation and concentrates the processing logic in the `fetchResults` endpoint. Revisit the individual answer record approach if direct Airtable analytics on individual answers becomes a critical requirement.
 
-## Future Development
+## Future Development & TODOs
 
-- Complete the implementation of the Airtable integration for self-assessments.
-- Expand the questionnaire logic and scoring.
-- Enhance UI/UX across all pages based on user feedback.
+- **Implement `fetchResults` Logic:** Complete the core logic in `/api/assessment/fetchResults/route.ts` to:
+    - Fetch and parse actual assessment data from Airtable.
+    - Fetch scoring information from `MethodAnswers`.
+    - Fetch question categories from `MethodQuestions`.
+    - Calculate category scores based on responses.
+    - Fetch provider data and implement matching logic (based on company type, categories, scores/maturity levels).
+    - Handle extraction of attachment URLs (e.g., `providerLogo`).
+- **Implement Email Report:** Create an API endpoint and integrate a service (e.g., SendGrid, Resend) to actually email the generated PDF report.
+- **Refine Provider Matching Algorithm:** Improve the logic for matching solution providers based on assessment results.
+- **Expand Questionnaire:** Add more questions and potentially refine categories.
+- **Enhance UI/UX:** Improve the visual presentation and user experience based on testing and feedback.
+- **Consider Individual Answer Saving:** Evaluate if the benefits of saving individual answers (as outlined in the placeholder) outweigh the complexity for future analytics needs.
 
 ## License
 
