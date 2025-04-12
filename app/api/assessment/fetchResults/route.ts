@@ -1,36 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
+import Airtable from 'airtable';
 
-// Placeholder for Airtable client or other data fetching logic
-// import { airtable } from '@/lib/airtable'; // Assuming an airtable client exists
+// Assuming base Airtable client is configured elsewhere or initialize here
+// Ensure AIRTABLE_PERSONAL_ACCESS_TOKEN and AIRTABLE_BASE_ID are in your .env.local
+const base = new Airtable({
+  apiKey: process.env.AIRTABLE_PERSONAL_ACCESS_TOKEN || ''
+}).base(process.env.AIRTABLE_BASE_ID || '');
 
-// Placeholder types (adjust as needed based on actual data structure)
-interface AssessmentResponse {
+// --- Airtable Table Names (adjust if different) ---
+const TBL_RESPONSES = 'AssessmentResponses';
+const TBL_ANSWERS = 'MethodAnswers';
+const TBL_QUESTIONS = 'MethodQuestions';
+const TBL_CATEGORIES = 'MethodCategories';
+const TBL_PROVIDERS = 'SolutionProviders';
+
+// --- Type Definitions (based on schema and expected output) ---
+interface AirtableRecord {
   id: string;
-  fields: {
-    responseId?: string;
-    responses?: string; // Assuming responses are stored as a JSON string
-    // Add other relevant fields
-  };
+  fields: Record<string, any>;
 }
 
-interface Provider {
-  id: string;
-  fields: {
-    name: string;
-    logo: string; // Assuming logo is a URL or path
-    shortDescription: string;
-    details: string;
-    contactName: string;
-    contactEmail: string;
-    contactPhone: string;
-    contactRole: string;
-    // Add other relevant fields
-  };
+interface ParsedResponses {
+  [questionId: string]: string; // questionId -> answerText_en
 }
 
-interface Metrics {
-  [key: string]: number;
+interface AnswerScoreMap {
+  [answerText: string]: number; // answerText_en -> answerScore
 }
+
+interface QuestionCategoryMap {
+  [questionRecordId: string]: string; // MethodQuestions Record ID -> categoryText_en
+}
+
+interface CategoryScores {
+  [categoryName: string]: { sum: number; count: number };
+}
+
+interface CalculatedMetrics {
+  [categoryName: string]: number; // categoryText_en -> average score (0-100)
+}
+
+interface FormattedProvider {
+  name: string;
+  logo: string | null; // URL or null if missing
+  shortDescription: string;
+  details: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  contactRole: string;
+}
+
+// Helper function to safely get attachment URL
+const getLogoUrl = (attachments: any): string | null => {
+  if (Array.isArray(attachments) && attachments.length > 0 && attachments[0].url) {
+    return attachments[0].url;
+  }
+  return null;
+};
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -40,108 +67,139 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Missing responseId parameter' }, { status: 400 });
   }
 
-  try {
-    // --- Placeholder Logic ---
-    // 1. Fetch assessment record using responseId
-    // Example: const assessmentRecord = await airtable.getRecord('Assessments', responseId); // Replace with actual fetch
-    console.log(`Fetching results for responseId: ${responseId}`);
-    // Mock assessment data for now
-    const mockAssessment: AssessmentResponse = {
-        id: responseId,
-        fields: {
-            responseId: responseId,
-            // Mock responses - replace with actual fetched data
-            responses: JSON.stringify({
-                'question1': 'Often',
-                'question2': 'Always',
-                'question3': 'Occasionally',
-                // ... more responses
-            })
-        }
-    };
+  const numericResponseId = Number(responseId);
+  if (isNaN(numericResponseId)) {
+    return NextResponse.json({ success: false, error: 'Invalid responseId format' }, { status: 400 });
+  }
 
-    // 2. Fetch relevant providers (replace with actual logic, potentially based on assessment)
-    // Example: const allProviders = await airtable.getRecords('Providers'); // Replace with actual fetch
-    // Mock provider data for now
-    const mockProviders: Provider[] = [
-      {
-        id: 'prov1',
-        fields: {
-            name: "Science and Business Park Tehnopol",
-            logo: "/logo/logo-Tehnopol.png",
-            shortDescription: "Expert in Business Strategy and Operations",
-            details: "We are a team of experts in business strategy and operations with vast experience in supporting startups and scaleups.",
-            contactName: "Rauno Varblas",
-            contactRole: "Head of AI and Innovation",
-            contactEmail: "rauno.varblas@tehnopol.ee",
-            contactPhone: "+372 5123 4567"
-        }
-      },
-       {
-        id: 'prov2',
-        fields: {
-            name: "AI & Robotics Estonia",
-            logo: "/logo/logo-AIRE.png",
-            shortDescription: "Consortia of Estonian AI and Robotics academics",
-            details: "We are flexible team of academics and support staff, ready to help you with your AI and robotics projects.",
-            contactName: "Evelin Ebruk",
-            contactRole: "Head of Client Relations",
-            contactEmail: "evelin.ebruk@aire-edih.eu",
-            contactPhone: "+372 5987 6543"
-        }
-      },
-      {
-        id: 'prov3',
-        fields: {
-            name: "Artifig",
-            logo: "/logo/logo-Artifig.png",
-            shortDescription: "Technical AI Solutions and Strategy",
-            details: "We are a small team of experts in AI with an academic background, and plenty of business experience. We are dedicated to providing the best possible solutions for our clients.",
-            contactName: "Otto Mättas",
-            contactRole: "AI Solutions Architect",
-            contactEmail: "otto@artifig.com",
-            contactPhone: "+372 5662 8362"
+  try {
+    console.log(`Fetching results for numericResponseId: ${numericResponseId}`);
+
+    // --- 1. Fetch AssessmentResponses Record ---
+    const responseRecords = await base(TBL_RESPONSES)
+      .select({ filterByFormula: `({responseId} = ${numericResponseId})`, maxRecords: 1 })
+      .firstPage();
+
+    if (!responseRecords || responseRecords.length === 0) {
+      console.error(`Assessment response not found for responseId: ${numericResponseId}`);
+      return NextResponse.json({ success: false, error: 'Assessment response not found' }, { status: 404 });
+    }
+    const assessmentRecord = responseRecords[0];
+    const responseContentString = assessmentRecord.fields.responseContent as string;
+    const linkedCompanyTypeIds = assessmentRecord.fields.MethodCompanyTypes as string[] | undefined; // Link field
+
+    if (!responseContentString || !linkedCompanyTypeIds || linkedCompanyTypeIds.length === 0) {
+      console.error(`Missing responseContent or MethodCompanyTypes link for record: ${assessmentRecord.id}`);
+      return NextResponse.json({ success: false, error: 'Incomplete assessment data found' }, { status: 400 });
+    }
+    const companyTypeId = linkedCompanyTypeIds[0]; // Assuming single link for now
+
+    // --- 2. Parse Response Content ---
+    let parsedResponses: ParsedResponses;
+    try {
+      parsedResponses = JSON.parse(responseContentString);
+    } catch (e) {
+      console.error(`Failed to parse responseContent JSON for record: ${assessmentRecord.id}`, e);
+      return NextResponse.json({ success: false, error: 'Corrupted assessment data found' }, { status: 500 });
+    }
+
+    // --- 3. Fetch MethodAnswers (Scoring Map) ---
+    const answerRecords = await base(TBL_ANSWERS).select({ fields: ['answerText_en', 'answerScore'] }).all();
+    const answerScoreMap: AnswerScoreMap = {};
+    answerRecords.forEach(record => {
+      if (record.fields.answerText_en && typeof record.fields.answerScore === 'number') {
+        answerScoreMap[record.fields.answerText_en as string] = record.fields.answerScore;
+      }
+    });
+
+    // --- 4. Fetch MethodCategories & MethodQuestions (Category Map) ---
+    const categoryRecords = await base(TBL_CATEGORIES).select({ fields: ['categoryText_en'] }).all();
+    const categoryNameMap = new Map<string, string>(); // record.id -> categoryText_en
+    categoryRecords.forEach(record => {
+      if (record.fields.categoryText_en) {
+        categoryNameMap.set(record.id, record.fields.categoryText_en as string);
+      }
+    });
+
+    const questionRecords = await base(TBL_QUESTIONS).select({ fields: ['MethodCategories'] }).all();
+    const questionCategoryMap: QuestionCategoryMap = {};
+    questionRecords.forEach(record => {
+      const linkedCategoryIds = record.fields.MethodCategories as string[] | undefined;
+      if (linkedCategoryIds && linkedCategoryIds.length > 0) {
+        const categoryName = categoryNameMap.get(linkedCategoryIds[0]);
+        if (categoryName) {
+          questionCategoryMap[record.id] = categoryName;
         }
       }
-    ];
+    });
 
+    // --- 5. Calculate Metrics ---
+    const categoryScores: CategoryScores = {};
+    for (const questionId in parsedResponses) {
+      const answerText = parsedResponses[questionId];
+      const categoryName = questionCategoryMap[questionId];
+      const score = answerScoreMap[answerText];
 
-    // 3. Calculate metrics based on responses (replace with actual calculation logic)
-    // Example: const calculatedMetrics = calculateMetrics(assessmentRecord.fields.responses);
-    // Mock metrics for now
-    const mockMetrics: Metrics = {
-      "Business Strategy": Math.floor(Math.random() * 51) + 50, // Random score 50-100
-      "Operations": Math.floor(Math.random() * 51) + 50,
-      "Growth & Marketing": Math.floor(Math.random() * 51) + 50,
-      "Digital Maturity": Math.floor(Math.random() * 51) + 50,
-      "Innovation Readiness": Math.floor(Math.random() * 51) + 50,
-      "AI & Data Capabilities": Math.floor(Math.random() * 51) + 50,
-      "Team & Skills": Math.floor(Math.random() * 51) + 50
-    };
+      if (categoryName !== undefined && score !== undefined) {
+        if (!categoryScores[categoryName]) {
+          categoryScores[categoryName] = { sum: 0, count: 0 };
+        }
+        categoryScores[categoryName].sum += score;
+        categoryScores[categoryName].count += 1;
+      } else {
+        console.warn(`Missing category or score for questionId: ${questionId}, answer: ${answerText}`);
+      }
+    }
 
-    // --- End Placeholder Logic ---
+    const calculatedMetrics: CalculatedMetrics = {};
+    for (const categoryName in categoryScores) {
+      const { sum, count } = categoryScores[categoryName];
+      calculatedMetrics[categoryName] = count > 0 ? Math.round((sum / count)) : 0; // Calculate average, handle division by zero
+    }
 
-    // Reformat providers to match the frontend structure if necessary
-    const formattedProviders = mockProviders.map(p => ({
-        name: p.fields.name,
-        logo: p.fields.logo,
-        shortDescription: p.fields.shortDescription,
-        details: p.fields.details,
-        contactName: p.fields.contactName,
-        contactEmail: p.fields.contactEmail,
-        contactPhone: p.fields.contactPhone,
-        contactRole: p.fields.contactRole,
+    // --- 6. Fetch and Filter Solution Providers ---
+    // Filter providers based on the company type linked to the assessment
+    const providerRecords = await base(TBL_PROVIDERS)
+      .select({
+        filterByFormula: `SEARCH("${companyTypeId}", ARRAYJOIN({MethodCompanyTypes}))`,
+        fields: [
+          'providerName_en',
+          'providerLogo',
+          'providerDescription_en',
+          'providerContactName',
+          'providerContactEmail',
+          'providerContactPhone',
+          // Add any other fields needed for display or more complex matching later
+          // e.g., MethodCategories, MethodMaturityLevels
+        ]
+      })
+      .all();
+
+    // --- 7. Format Providers ---
+    const formattedProviders: FormattedProvider[] = providerRecords.map(record => ({
+      name: record.fields.providerName_en as string || 'N/A',
+      logo: getLogoUrl(record.fields.providerLogo), // Use helper to get URL
+      shortDescription: (record.fields.providerDescription_en as string || 'No description available.').substring(0, 100) + '...', // Example: Use full description or create a dedicated short desc field
+      details: record.fields.providerDescription_en as string || 'No details available.',
+      contactName: record.fields.providerContactName as string || 'N/A',
+      contactEmail: record.fields.providerContactEmail as string || 'N/A',
+      contactPhone: record.fields.providerContactPhone as string || 'N/A',
+      contactRole: record.fields.providerContactRole as string || 'N/A' // Assuming contactRole exists
     }));
 
-
+    // --- 8. Return Response ---
     return NextResponse.json({
       success: true,
-      metrics: mockMetrics,
+      metrics: calculatedMetrics,
       providers: formattedProviders,
     });
 
   } catch (error: any) {
     console.error('Error fetching assessment results:', error);
+    // Log the specific error stack if available
+    if (error.stack) {
+      console.error(error.stack);
+    }
     return NextResponse.json({ success: false, error: error.message || 'Failed to fetch results' }, { status: 500 });
   }
 } 
