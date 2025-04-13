@@ -29,15 +29,20 @@ interface AnswerScoreMap {
 }
 
 interface QuestionCategoryMap {
-  [questionRecordId: string]: { categoryId: string; categoryName: string }; // Store both ID and name
+  [questionRecordId: string]: { categoryId: string; categoryName: string };
+}
+
+interface CategoryResult {
+    score: number;
+    description: string;
+}
+
+interface CalculatedMetrics {
+  [categoryName: string]: CategoryResult;
 }
 
 interface CategoryScores {
   [categoryName: string]: { sum: number; count: number };
-}
-
-interface CalculatedMetrics {
-  [categoryName: string]: number; // categoryText_en -> average score (0-100)
 }
 
 interface FormattedProvider {
@@ -116,12 +121,15 @@ export async function GET(request: NextRequest) {
     });
 
     // --- 4. Fetch MethodCategories & MethodQuestions (Category Map) ---
-    const categoryRecords = await base(TBL_CATEGORIES).select({ fields: ['categoryText_en'] }).all();
+    const categoryRecords = await base(TBL_CATEGORIES).select({ fields: ['categoryText_en', 'categoryDescription_en'] }).all();
     const categoryNameToIdMap = new Map<string, string>(); // categoryText_en -> record.id
+    const categoryDataMap = new Map<string, { id: string; description: string }>(); // Map name -> {id, description}
     categoryRecords.forEach(record => {
       const name = record.fields.categoryText_en as string;
+      const description = record.fields.categoryDescription_en as string || ''; // Get description
       if (name) {
         categoryNameToIdMap.set(name, record.id);
+        categoryDataMap.set(name, { id: record.id, description }); // Store description
       }
     });
 
@@ -158,16 +166,21 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Create the final metrics object including descriptions
     const calculatedMetrics: CalculatedMetrics = {};
     for (const categoryName in categoryScores) {
       const { sum, count } = categoryScores[categoryName];
-      calculatedMetrics[categoryName] = count > 0 ? Math.round((sum / count)) : 0;
+      const categoryData = categoryDataMap.get(categoryName);
+      calculatedMetrics[categoryName] = {
+          score: count > 0 ? Math.round((sum / count)) : 0,
+          description: categoryData?.description || 'No description available.' // Add description
+      };
     }
-    console.log("Calculated Metrics:", calculatedMetrics);
+    console.log("Calculated Metrics (with descriptions):", calculatedMetrics);
 
     // --- 6. Identify Low-Score Categories ---
     const metricsArray = Object.entries(calculatedMetrics);
-    metricsArray.sort(([, scoreA], [, scoreB]) => scoreA - scoreB); // Sort ascending by score
+    metricsArray.sort(([, resultA], [, resultB]) => resultA.score - resultB.score); // Sort ascending by score
     // Target categories - e.g., the lowest 2 scoring categories
     const targetCategoryNames = metricsArray.slice(0, 2).map(([name]) => name);
     const targetCategoryIds = targetCategoryNames
