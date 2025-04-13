@@ -128,12 +128,34 @@ const styles = StyleSheet.create({
   },
   radarChartContainer: {
     width: '100%',
-    height: 200,
+    height: 450,
     marginVertical: 10,
     alignItems: 'center',
     padding: 10,
   },
 });
+
+// Helper function to manually wrap long labels - NOW RETURNS string[]
+const formatLabel = (label: string, maxLineLength: number): string[] => {
+  const words = label.split(' ');
+  let currentLine = '';
+  const lines: string[] = []; // Explicitly type as string[]
+
+  words.forEach(word => {
+    if (currentLine.length === 0) {
+      currentLine = word;
+    } else if (currentLine.length + word.length + 1 <= maxLineLength) {
+      currentLine += ` ${word}`;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  });
+  lines.push(currentLine);
+
+  // return lines.join('\n'); // Don't join, return array
+  return lines;
+};
 
 // Helper functions for radar chart
 const polarToCartesian = (centerX: number, centerY: number, radius: number, angleInDegrees: number) => {
@@ -157,10 +179,12 @@ const createRadarPath = (centerX: number, centerY: number, radius: number, point
 
 const RadarChartPDF = ({ data }: { data: { category: string; value: number }[] }) => {
   const centerX = 300;
-  const centerY = 100;
-  const radius = 75; 
+  const centerY = 225;
+  const radius = 180;
   const numPoints = data.length;
   const values = data.map(d => d.value);
+  const labelFontSize = 6;
+  const labelLineHeight = labelFontSize * 1.2;
 
   // Create grid lines
   const gridLines = Array.from({ length: 5 }, (_, i) => {
@@ -185,7 +209,7 @@ const RadarChartPDF = ({ data }: { data: { category: string; value: number }[] }
 
   return (
     <View style={styles.radarChartContainer}>
-      <Svg width="600" height="200">
+      <Svg width="600" height="450">
         {/* Grid circles */}
         {gridLines.map((points, i) => (
           <G key={`grid-${i}`}>
@@ -219,24 +243,36 @@ const RadarChartPDF = ({ data }: { data: { category: string; value: number }[] }
           strokeWidth={1}
         />
 
-        {/* Category labels */}
+        {/* Category labels - Render multiple Text elements per label */}
         {data.map((d, i) => {
           const angle = (360 / numPoints) * i;
-          const point = polarToCartesian(centerX, centerY, radius + 8, angle);
+          const point = polarToCartesian(centerX, centerY, radius + 15, angle); 
+          const maxCharsPerLine = 20; 
+          const labelLines = formatLabel(d.category, maxCharsPerLine);
+          // Calculate initial Y offset to center the block of text vertically
+          const initialY = point.y - ((labelLines.length - 1) * labelLineHeight) / 2;
           
           return (
-            <Text
-              key={`label-${i}`}
-              x={point.x}
-              y={point.y}
-              style={{
-                fontSize: 6,
-                fill: '#4B5563',
-                textAnchor: angle > 180 ? 'end' : (angle === 0 || angle === 180 ? 'middle' : 'start'),
-              }}
-            >
-              {d.category}
-            </Text>
+            // Use a G (group) element for each multi-line label if needed, though Text might suffice
+            <G key={`label-group-${i}`}>
+              {labelLines.map((line, lineIndex) => (
+                  <Text
+                    key={`label-${i}-line-${lineIndex}`}
+                    x={point.x}
+                    // Position each line vertically
+                    y={initialY + lineIndex * labelLineHeight}
+                    style={{
+                      fontSize: labelFontSize,
+                      fill: '#4B5563',
+                      textAnchor: angle > 180 ? 'end' : (angle === 0 || angle === 180 ? 'middle' : 'start'),
+                      // dominantBaseline might be less predictable with multi-line, remove or adjust
+                      // dominantBaseline: 'middle', 
+                    }}
+                  >
+                    {line} 
+                  </Text>
+              ))}
+            </G>
           );
         })}
 
