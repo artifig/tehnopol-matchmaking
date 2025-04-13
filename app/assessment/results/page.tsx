@@ -155,7 +155,7 @@ export default function ResultsPage() {
           {/* Radar Chart Section */}
           <div className="max-w-xl mx-auto w-full mb-12">
             <h2 className="text-2xl font-semibold mb-6 text-gray-700 dark:text-gray-300">Performance Overview</h2>
-            <div className="w-full h-64 mb-6">
+            <div style={{ height: '500px' }} className="w-full mb-6">
               {metrics && <RadarChart metrics={metrics} />}
             </div>
             {metrics && <MetricItem title="Overall Score" score={overallScore} description={null} />}
@@ -270,12 +270,50 @@ function RadarChart({ metrics }: { metrics: Metrics }) {
       value: result.score
   }));
 
+  // Custom tick renderer for wrapping text using currentColor and fontSize defaults
+  const renderCustomTick = (props: any) => {
+    const { x, y, payload, fill = 'currentColor', fontSize = 9, cx, cy } = props;
+    const offset = 35; // distance to push the text away from the chart
+    let newX = x, newY = y;
+    if (cx !== undefined && cy !== undefined) {
+      const dx = x - cx;
+      const dy = y - cy;
+      const len = Math.sqrt(dx * dx + dy * dy);
+      if (len !== 0) {
+        newX = x + (dx / len) * offset;
+        newY = y + (dy / len) * offset;
+      }
+    }
+
+    const text = payload.value;
+    const words = text.split(" ");
+    let lines: string[] = [];
+    let line = "";
+    words.forEach((word: string) => {
+       if ((line + word).length > 20 && line !== "") {
+          lines.push(line);
+          line = word + " ";
+       } else {
+          line += word + " ";
+       }
+    });
+    lines.push(line.trim());
+
+    return (
+      <text x={newX} y={newY} textAnchor="middle" fill={fill} fontSize={fontSize}>
+        {lines.map((line, index) => (
+          <tspan x={newX} dy={index === 0 ? 0 : fontSize} key={index}>{line}</tspan>
+        ))}
+      </text>
+    );
+  };
+
   return (
     <div className="w-full h-full">
       <ResponsiveContainer width="100%" height="100%">
-        <RechartsRadarChart data={data}>
+        <RechartsRadarChart data={data} outerRadius="90%" margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>
           <PolarGrid gridType="circle" />
-          <PolarAngleAxis dataKey="category" tick={{ fill: 'currentColor', fontSize: 12 }} />
+          <PolarAngleAxis dataKey="category" tick={renderCustomTick} />
           <Radar
             name="Performance"
             dataKey="value"
