@@ -16,8 +16,13 @@ interface Provider {
   contactRole: string;
 }
 
+interface MetricResult {
+  score: number;
+  description: string;
+}
+
 interface Metrics {
-  [key: string]: number;
+  [categoryName: string]: MetricResult;
 }
 
 export default function ResultsPage() {
@@ -65,7 +70,7 @@ export default function ResultsPage() {
 
   const overallScore = metrics
     ? Math.round(
-        Object.values(metrics).reduce((sum, value) => sum + value, 0) / Object.values(metrics).length
+        Object.values(metrics).reduce((sum, metricResult) => sum + metricResult.score, 0) / Object.values(metrics).length
       )
     : 0;
 
@@ -153,7 +158,7 @@ export default function ResultsPage() {
             <div className="w-full h-64 mb-6">
               {metrics && <RadarChart metrics={metrics} />}
             </div>
-            {metrics && <MetricItem title="Overall Score" value={overallScore} />}
+            {metrics && <MetricItem title="Overall Score" score={overallScore} description={null} />}
             <button 
               onClick={() => setIsMetricsModalOpen(true)} 
               className="btn text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 w-full flex items-center justify-center"
@@ -243,8 +248,13 @@ export default function ResultsPage() {
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-4">Detailed Metrics</h3>
             <div className="space-y-6">
-              {Object.entries(metrics).map(([title, value]) => (
-                <MetricItem key={title} title={title} value={value} />
+              {Object.entries(metrics).map(([title, metricResult]) => (
+                <MetricItem 
+                  key={title} 
+                  title={title} 
+                  score={metricResult.score} 
+                  description={metricResult.description}
+                />
               ))}
             </div>
           </div>
@@ -255,7 +265,10 @@ export default function ResultsPage() {
 }
 
 function RadarChart({ metrics }: { metrics: Metrics }) {
-  const data = Object.entries(metrics).map(([category, value]) => ({ category, value }));
+  const data = Object.entries(metrics).map(([category, result]) => ({ 
+      category, 
+      value: result.score
+  }));
 
   return (
     <div className="w-full h-full">
@@ -294,17 +307,29 @@ function RadarChart({ metrics }: { metrics: Metrics }) {
   );
 }
 
-function MetricItem({ title, value }: { title: string; value: number }) {
+function MetricItem({ title, score, description }: { title: string; score: number; description: string | null }) {
   return (
     <div className="mb-4">
-      <div className="flex justify-between mb-2">
-        <span className="text-gray-700 dark:text-gray-300 font-medium">{title}</span>
-        <span className="text-gray-700 dark:text-gray-300 font-medium">{value}%</span>
+      <div className="flex justify-between items-center mb-1">
+        <div className="flex items-center">
+          <span className="text-gray-700 dark:text-gray-300 font-medium mr-1">{title}</span>
+          {description && (
+            <div className="inline-block cursor-help group relative">
+                <svg className="w-4 h-4 fill-current text-gray-400 dark:text-gray-500" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z"></path>
+                </svg>
+                <span className="absolute left-0 -top-2 ml-6 w-64 p-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10 dark:bg-gray-100 dark:text-gray-800 shadow-lg">
+                    {description}
+                </span>
+            </div>
+          )}
+        </div>
+        <span className="text-gray-700 dark:text-gray-300 font-medium">{score}%</span>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
         <div 
           className="bg-orange-500 h-2.5 rounded-full transition-all duration-300" 
-          style={{ width: `${value}%` }} 
+          style={{ width: `${score}%` }} 
         />
       </div>
     </div>
