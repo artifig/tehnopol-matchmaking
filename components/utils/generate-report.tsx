@@ -8,6 +8,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     padding: 30,
   },
+  pageColumnContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  pageColumn: {
+    width: '48%',
+  },
   header: {
     marginBottom: 15,
     borderBottomWidth: 1,
@@ -44,7 +51,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   metricItemContainer: {
-    marginBottom: 12,
+    marginBottom: 8,
+    height: 60,
   },
   metricRow: {
     flexDirection: 'row',
@@ -53,11 +61,11 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   metricLabel: {
-    fontSize: 12,
+    fontSize: 8,
     color: '#4B5563',
   },
   metricValue: {
-    fontSize: 12,
+    fontSize: 8,
     color: '#1F2937',
   },
   metricBar: {
@@ -71,7 +79,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   metricDescription: {
-    fontSize: 10,
+    fontSize: 7,
     color: '#6B7280',
     marginTop: 4,
   },
@@ -288,6 +296,11 @@ export const AssessmentReport = ({ metrics, overallScore, providers, userInfo }:
     value: m.score
   }));
 
+  // Calculate midpoint for column split
+  const midpoint = Math.ceil(metrics.length / 2);
+  const firstColumnMetrics = metrics.slice(0, midpoint);
+  const secondColumnMetrics = metrics.slice(midpoint);
+
   return (
     <Document>
       {/* Page 1: Assessment Results */}
@@ -324,33 +337,67 @@ export const AssessmentReport = ({ metrics, overallScore, providers, userInfo }:
           </View>
         </View>
 
-        {/* Detailed Metrics - Updated Structure */}
-        <View style={[styles.section, { marginTop: 0 }]}>
-          <Text style={styles.subtitle}>Detailed Metrics</Text>
-          <View style={styles.metricsContainer}>
-            {metrics.map((metric, index) => (
-              <View key={index} style={styles.metricItemContainer}>
-                <View style={styles.metricRow}>
-                  <Text style={styles.metricLabel}>{metric.category}</Text>
-                  <Text style={styles.metricValue}>{metric.score}%</Text>
+        {/* Page Number for Page 1 */}
+        <Text style={styles.pageNumber}>1 / 3</Text>
+      </Page>
+
+      {/* Page 2: Detailed Metrics (Two Columns) */}
+      <Page size="A4" style={styles.page}>
+        {/* Optional: Repeat simplified header if needed */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Detailed Metrics</Text>
+        </View>
+
+        {/* Section containing the two columns */}
+        <View style={styles.section}>
+          <View style={styles.pageColumnContainer}>
+            {/* First Column */}
+            <View style={styles.pageColumn}>
+              {firstColumnMetrics.map((metric, index) => (
+                <View key={`col1-${index}`} style={styles.metricItemContainer}>
+                  <View style={styles.metricRow}>
+                    <Text style={styles.metricLabel}>{metric.category}</Text>
+                    <Text style={styles.metricValue}>{metric.score}%</Text>
+                  </View>
+                  <View style={styles.metricBar}>
+                    <View style={[styles.metricFill, { width: `${metric.score}%` }]} />
+                  </View>
+                  {metric.description && (
+                    <Text style={styles.metricDescription}>
+                      {metric.description}
+                    </Text>
+                  )}
                 </View>
-                <View style={styles.metricBar}>
-                  <View style={[styles.metricFill, { width: `${metric.score}%` }]} />
+              ))}
+            </View>
+
+            {/* Second Column */}
+            <View style={styles.pageColumn}>
+              {secondColumnMetrics.map((metric, index) => (
+                <View key={`col2-${index}`} style={styles.metricItemContainer}>
+                  <View style={styles.metricRow}>
+                    <Text style={styles.metricLabel}>{metric.category}</Text>
+                    <Text style={styles.metricValue}>{metric.score}%</Text>
+                  </View>
+                  <View style={styles.metricBar}>
+                    <View style={[styles.metricFill, { width: `${metric.score}%` }]} />
+                  </View>
+                  {metric.description && (
+                    <Text style={styles.metricDescription}>
+                      {metric.description}
+                    </Text>
+                  )}
                 </View>
-                {metric.description && (
-                  <Text style={styles.metricDescription}>
-                    {metric.description}
-                  </Text>
-                )}
-              </View>
-            ))}
+              ))}
+            </View>
           </View>
         </View>
 
-        <Text style={styles.pageNumber}>1/2</Text>
+        {/* Page Number for Page 2 */}
+        <Text style={styles.pageNumber}>2 / 3</Text>
       </Page>
 
-      {/* Page 2: Solution Providers */}
+      {/* Page 3: Solution Providers */}
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
           <View style={styles.headerContent}>
@@ -380,7 +427,8 @@ export const AssessmentReport = ({ metrics, overallScore, providers, userInfo }:
           </View>
         ))}
 
-        <Text style={styles.pageNumber}>2/2</Text>
+        {/* Page Number for Page 3 */}
+        <Text style={styles.pageNumber}>3 / 3</Text>
       </Page>
     </Document>
   );
