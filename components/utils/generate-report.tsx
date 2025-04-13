@@ -378,14 +378,22 @@ export const AssessmentReport = ({ metrics, overallScore, providers, userInfo }:
       </Page>
 
       {/* Page 2: Detailed Metrics (Two Columns) */}
-      <Page size="A4" style={styles.page}>
-        {/* Optional: Repeat simplified header if needed */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Detailed Metrics</Text>
-        </View>
+      <Page size="A4" style={styles.page}> 
+         {/* Add the full header structure including the logo */}
+         <View style={styles.header}>
+             {/* Keep Title */} 
+             <View style={styles.headerContent}>
+                <Text style={styles.title}>Detailed Metrics</Text>
+             </View>
+             {/* Add Logo */}
+             <Image 
+                src="/logo/logo-Tehnopol.png"
+                style={styles.headerLogo}
+            />
+         </View>
 
-        {/* Section containing the two columns */}
-        <View style={styles.section}>
+         {/* Section containing the two columns */}
+         <View style={styles.section}>
           <View style={styles.pageColumnContainer}>
             {/* First Column */}
             <View style={styles.pageColumn}>
@@ -429,8 +437,8 @@ export const AssessmentReport = ({ metrics, overallScore, providers, userInfo }:
           </View>
         </View>
 
-        {/* Page Number for Page 2 */}
-        <Text style={styles.pageNumber}>2 / 3</Text>
+         {/* Page Number for Page 2 */}
+         <Text style={styles.pageNumber}>2 / 3</Text> 
       </Page>
 
       {/* Page 3: Solution Providers */}
