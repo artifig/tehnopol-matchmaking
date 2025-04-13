@@ -307,11 +307,10 @@ interface Provider {
   name: string;
   logo: string;
   shortDescription: string;
-  details: string;
+  providerUrl: string;
   contactName: string;
   contactEmail: string;
   contactPhone: string;
-  contactRole: string;
 }
 
 interface AssessmentReportProps {
@@ -462,9 +461,9 @@ export const AssessmentReport = ({ metrics, overallScore, providers, userInfo }:
             />
             <Text style={styles.providerName}>{provider.name}</Text>
             <Text style={styles.providerDetails}>{provider.shortDescription}</Text>
-            <Text style={styles.providerDetails}>{provider.details}</Text>
+            <Text style={styles.providerDetails}>{provider.providerUrl}</Text>
             <View style={styles.contactInfo}>
-              <Text>{provider.contactName} - {provider.contactRole}</Text>
+              <Text>{provider.contactName}</Text>
               <Text>Email: {provider.contactEmail}</Text>
               <Text>Phone: {provider.contactPhone}</Text>
             </View>

@@ -49,7 +49,7 @@ interface FormattedProvider {
   name: string;
   logo: string | null; // URL or null if missing
   shortDescription: string;
-  details: string;
+  providerUrl: string;
   contactName: string;
   contactEmail: string;
   contactPhone: string;
@@ -203,10 +203,11 @@ export async function GET(request: NextRequest) {
       .select({
         // filterByFormula: `SEARCH("${companyTypeId}", ARRAYJOIN({MethodCompanyTypes}))`, // REMOVED
         // Example: Filter by active if needed: filterByFormula: `{isActive} = 1`,
-        fields: [ 
+        fields: [
           'providerName_en',
           'providerLogo',
-          'providerDescription_en', 
+          'providerDescription_en',
+          'providerUrl',
           'providerContactName',
           'providerContactEmail',
           'providerContactPhone',
@@ -248,8 +249,8 @@ export async function GET(request: NextRequest) {
     const formattedProviders: FormattedProvider[] = categoryFilteredProviders.map(record => ({
       name: record.fields.providerName_en as string || 'N/A',
       logo: getLogoUrl(record.fields.providerLogo),
-      shortDescription: (record.fields.providerDescription_en as string || 'No description available.').substring(0, 100) + '...', 
-      details: record.fields.providerDescription_en as string || 'No details available.', 
+      shortDescription: record.fields.providerDescription_en as string || 'No description available.',
+      providerUrl: record.fields.providerUrl as string || 'No URL available.',
       contactName: record.fields.providerContactName as string || 'N/A',
       contactEmail: record.fields.providerContactEmail as string || 'N/A',
       contactPhone: record.fields.providerContactPhone as string || 'N/A'

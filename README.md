@@ -76,7 +76,7 @@ Tehnopol Matchmaking is a dynamic website offering a variety of pages and intera
         - Identifies the categories with the lowest scores.
         - Fetches `SolutionProviders`, initially filtering by `MethodCompanyTypes`.
         - **Filters the provider list further in code, keeping only providers linked to at least one of the identified low-score `MethodCategories`.**
-        - Formats the final filtered list of providers.
+        - Formats the final filtered list of providers (including fields like `name`, `logo`, `shortDescription`, `providerUrl`, and contact info).
     - Displays results, including a radar chart and provider cards.
     - Stores `metrics`, `providers`, and `responseId` in `localStorage` before redirecting for report actions.
 5.  **Contact Page (`/contact?action=download` or `?action=email`):**

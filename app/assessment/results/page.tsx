@@ -9,7 +9,7 @@ interface Provider {
   name: string;
   logo: string;
   shortDescription: string;
-  details: string;
+  providerUrl: string;
   contactName: string;
   contactEmail: string;
   contactPhone: string;
@@ -219,7 +219,7 @@ export default function ResultsPage() {
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">{selectedProvider.name}</h3>
             <p className="text-gray-600 dark:text-gray-400">{selectedProvider.shortDescription}</p>
-            <p className="text-gray-600 dark:text-gray-400">{selectedProvider.details}</p>
+            <p className="text-gray-600 dark:text-gray-400">{selectedProvider.providerUrl}</p>
             <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
               <p className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Contact Information</p>
               <div className="flex flex-col space-y-1">
