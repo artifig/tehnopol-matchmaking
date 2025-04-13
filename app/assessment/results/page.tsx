@@ -311,16 +311,20 @@ function MetricItem({ title, value }: { title: string; value: number }) {
   );
 }
 
-function SolutionCard({ name, logo, onLearnMore }: { name: string; logo: string; onLearnMore: () => void; }) {
+function SolutionCard({ name, logo, onLearnMore }: { name: string; logo: string | null; onLearnMore: () => void; }) {
   return (
     <div className="p-4 border-b border-gray-200 dark:border-gray-700 last:border-0">
       <div className="flex items-center gap-4">
-        <div className="w-14 h-14 flex-shrink-0 bg-gray-100 dark:bg-gray-400 rounded-lg p-2">
-          <img 
-            src={logo} 
-            alt={`${name} logo`} 
-            className={`w-full h-full object-contain ${logo.includes('AIRE') ? 'dark:invert' : ''}`}
-          />
+        <div className="w-14 h-14 flex-shrink-0 bg-gray-100 dark:bg-gray-400 rounded-lg p-2 flex items-center justify-center">
+          {logo ? (
+            <img 
+              src={logo} 
+              alt={`${name} logo`} 
+              className={`w-full h-full object-contain ${logo && logo.includes('AIRE') ? 'dark:invert' : ''}`}
+            />
+          ) : (
+            <span className="text-xs text-gray-500 dark:text-gray-300">No Logo</span>
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 truncate pr-2">{name}</h3>

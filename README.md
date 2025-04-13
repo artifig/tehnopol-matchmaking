@@ -72,9 +72,11 @@ Tehnopol Matchmaking is a dynamic website offering a variety of pages and intera
         - Reads the `responseContent` (the ID map).
         - Fetches `MethodAnswers` to get the score for each `answerRecordId`.
         - Fetches `MethodQuestions` and `MethodCategories` to link questions to categories.
-        - Calculates average scores per category.
-        - Fetches `SolutionProviders` filtered by `MethodCompanyTypes`.
-        - Formats the results.
+        - Calculates average scores per category (`metrics`).
+        - Identifies the categories with the lowest scores.
+        - Fetches `SolutionProviders`, initially filtering by `MethodCompanyTypes`.
+        - **Filters the provider list further in code, keeping only providers linked to at least one of the identified low-score `MethodCategories`.**
+        - Formats the final filtered list of providers.
     - Displays results, including a radar chart and provider cards.
     - Stores `metrics`, `providers`, and `responseId` in `localStorage` before redirecting for report actions.
 5.  **Contact Page (`/contact?action=download` or `?action=email`):**
@@ -120,7 +122,7 @@ Two primary approaches exist for saving user assessment responses to Airtable:
 ## Future Development & TODOs
 
 - **Implement Email Report:** Create an API endpoint and integrate a service (e.g., SendGrid, Resend) to actually email the generated PDF report.
-- **Refine Provider Matching Algorithm:** The `/api/assessment/fetchResults` currently only filters providers by `MethodCompanyTypes`. Enhance this logic to potentially rank or filter providers based on calculated category scores (`metrics`) or links to `MethodCategories` / `MethodMaturityLevels`.
+- **Refine Provider Matching Algorithm:** The `/api/assessment/fetchResults` now filters providers by Company Type and matching low-score Categories. Consider adding more sophisticated ranking (e.g., based on `MethodMaturityLevels` linked to providers and category scores) or weighting.
 - **Expand Questionnaire:** Add more questions and potentially refine categories.
 - **Enhance UI/UX:** Improve the visual presentation and user experience based on testing and feedback.
 - **Error Handling:** Add more robust error handling and user feedback, especially for API call failures (e.g., in `questions/page.tsx` when saving responses, or in `contact/page.tsx` when updating info).

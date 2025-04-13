@@ -29,7 +29,7 @@ interface AnswerScoreMap {
 }
 
 interface QuestionCategoryMap {
-  [questionRecordId: string]: string; // MethodQuestions Record ID -> categoryText_en
+  [questionRecordId: string]: { categoryId: string; categoryName: string }; // Store both ID and name
 }
 
 interface CategoryScores {
@@ -117,10 +117,11 @@ export async function GET(request: NextRequest) {
 
     // --- 4. Fetch MethodCategories & MethodQuestions (Category Map) ---
     const categoryRecords = await base(TBL_CATEGORIES).select({ fields: ['categoryText_en'] }).all();
-    const categoryNameMap = new Map<string, string>(); // record.id -> categoryText_en
+    const categoryNameToIdMap = new Map<string, string>(); // categoryText_en -> record.id
     categoryRecords.forEach(record => {
-      if (record.fields.categoryText_en) {
-        categoryNameMap.set(record.id, record.fields.categoryText_en as string);
+      const name = record.fields.categoryText_en as string;
+      if (name) {
+        categoryNameToIdMap.set(name, record.id);
       }
     });
 
@@ -129,9 +130,10 @@ export async function GET(request: NextRequest) {
     questionRecords.forEach(record => {
       const linkedCategoryIds = record.fields.MethodCategories as string[] | undefined;
       if (linkedCategoryIds && linkedCategoryIds.length > 0) {
-        const categoryName = categoryNameMap.get(linkedCategoryIds[0]);
-        if (categoryName) {
-          questionCategoryMap[record.id] = categoryName;
+        const categoryId = linkedCategoryIds[0]; // Assuming one category per question
+        const categoryName = categoryRecords.find(cr => cr.id === categoryId)?.fields.categoryText_en as string;
+        if (categoryId && categoryName) {
+          questionCategoryMap[record.id] = { categoryId, categoryName };
         }
       }
     });
@@ -140,10 +142,11 @@ export async function GET(request: NextRequest) {
     const categoryScores: CategoryScores = {};
     for (const questionId in parsedResponses) {
       const answerId = parsedResponses[questionId]; // This is now Answer Record ID
-      const categoryName = questionCategoryMap[questionId];
+      const categoryInfo = questionCategoryMap[questionId];
       const score = answerScoreMap[answerId]; // Get score using Answer Record ID
 
-      if (categoryName !== undefined && score !== undefined) {
+      if (categoryInfo && score !== undefined) {
+        const categoryName = categoryInfo.categoryName;
         if (!categoryScores[categoryName]) {
           categoryScores[categoryName] = { sum: 0, count: 0 };
         }
@@ -151,7 +154,7 @@ export async function GET(request: NextRequest) {
         categoryScores[categoryName].count += 1;
       } else {
         // More specific warning
-        console.warn(`Missing category for questionId: ${questionId} OR score for answerId: ${answerId}`);
+        console.warn(`Missing category info for questionId: ${questionId} OR score for answerId: ${answerId}`);
       }
     }
 
@@ -160,35 +163,87 @@ export async function GET(request: NextRequest) {
       const { sum, count } = categoryScores[categoryName];
       calculatedMetrics[categoryName] = count > 0 ? Math.round((sum / count)) : 0;
     }
+    console.log("Calculated Metrics:", calculatedMetrics);
 
-    // --- 6. Fetch and Filter Solution Providers ---
-    // Filter providers based on the company type linked to the assessment
-    const providerRecords = await base(TBL_PROVIDERS)
+    // --- 6. Identify Low-Score Categories ---
+    const metricsArray = Object.entries(calculatedMetrics);
+    metricsArray.sort(([, scoreA], [, scoreB]) => scoreA - scoreB); // Sort ascending by score
+    // Target categories - e.g., the lowest 2 scoring categories
+    const targetCategoryNames = metricsArray.slice(0, 2).map(([name]) => name);
+    const targetCategoryIds = targetCategoryNames
+        .map(name => categoryNameToIdMap.get(name))
+        .filter((id): id is string => id !== undefined);
+    
+    console.log("Targeting providers for low-score categories:", targetCategoryNames, "with IDs:", targetCategoryIds);
+
+    // --- 7. Fetch and Filter Solution Providers --- 
+    let allProviderRecords: Readonly<AirtableRecord[]> = [];
+    let companyTypeFilteredProviders: AirtableRecord[] = [];
+    let categoryFilteredProviders: AirtableRecord[] = []; 
+
+    // **ADDED LOGGING**: Log the companyTypeId being used for the filter
+    console.log(`Filtering providers using Company Type ID: ${companyTypeId}`); 
+
+    // Fetch ALL active providers (or remove filterByFormula if count is small)
+    // Remove the complex SEARCH formula
+    allProviderRecords = await base(TBL_PROVIDERS) 
       .select({
-        filterByFormula: `SEARCH("${companyTypeId}", ARRAYJOIN({MethodCompanyTypes}))`,
-        fields: [
+        // filterByFormula: `SEARCH("${companyTypeId}", ARRAYJOIN({MethodCompanyTypes}))`, // REMOVED
+        // Example: Filter by active if needed: filterByFormula: `{isActive} = 1`,
+        fields: [ 
           'providerName_en',
           'providerLogo',
-          'providerDescription_en',
+          'providerDescription_en', 
           'providerContactName',
           'providerContactEmail',
-          'providerContactPhone'
+          'providerContactPhone',
+          'MethodCompanyTypes',
+          'MethodCategories' // Keep fetching categories for the next step
         ]
       })
       .all();
+    console.log(`Fetched ${allProviderRecords.length} total providers.`);
 
-    // --- 7. Format Providers ---
-    const formattedProviders: FormattedProvider[] = providerRecords.map(record => ({
+    // **NEW**: Filter by Company Type ID in code
+    companyTypeFilteredProviders = allProviderRecords.filter(record => {
+        const linkedCompanyTypes = (record.fields as any).MethodCompanyTypes as string[] | undefined;
+        return linkedCompanyTypes?.includes(companyTypeId); // Check if the array includes the ID
+    });
+    console.log(`Found ${companyTypeFilteredProviders.length} providers matching company type ID: ${companyTypeId}.`);
+
+    // Filter by Target Categories (only if providers found and target IDs exist)
+    if (targetCategoryIds.length > 0 && companyTypeFilteredProviders.length > 0) {
+        categoryFilteredProviders = companyTypeFilteredProviders.filter(record => {
+            const linkedProviderCategories = (record.fields as any).MethodCategories as string[] | undefined;
+            if (!linkedProviderCategories) return false;
+            const isMatch = linkedProviderCategories.some(providerCatId => targetCategoryIds.includes(providerCatId));
+            return isMatch;
+        });
+        console.log(`Found ${categoryFilteredProviders.length} providers matching company type AND target categories.`);
+    } else {
+        // If no target categories or no providers after company type filter, use the companyTypeFiltered list
+        categoryFilteredProviders = companyTypeFilteredProviders; 
+        if (targetCategoryIds.length === 0) {
+             console.log("No target categories identified, using all providers matching company type.");
+        } else {
+             console.log("No providers matched company type, skipping category filter.");
+        }
+    }
+    
+    // --- 8. Format Providers --- 
+    // Format the *final* filtered list
+    const formattedProviders: FormattedProvider[] = categoryFilteredProviders.map(record => ({
       name: record.fields.providerName_en as string || 'N/A',
-      logo: getLogoUrl(record.fields.providerLogo), // Use helper to get URL
-      shortDescription: (record.fields.providerDescription_en as string || 'No description available.').substring(0, 100) + '...',
-      details: record.fields.providerDescription_en as string || 'No details available.',
+      logo: getLogoUrl(record.fields.providerLogo),
+      shortDescription: (record.fields.providerDescription_en as string || 'No description available.').substring(0, 100) + '...', 
+      details: record.fields.providerDescription_en as string || 'No details available.', 
       contactName: record.fields.providerContactName as string || 'N/A',
       contactEmail: record.fields.providerContactEmail as string || 'N/A',
       contactPhone: record.fields.providerContactPhone as string || 'N/A'
     }));
+    
 
-    // --- 8. Return Response ---
+    // --- 9. Return Response --- 
     return NextResponse.json({
       success: true,
       metrics: calculatedMetrics,
