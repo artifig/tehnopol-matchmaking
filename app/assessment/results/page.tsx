@@ -312,19 +312,22 @@ function MetricItem({ title, score, description }: { title: string; score: numbe
     <div className="mb-4">
       <div className="flex justify-between items-center mb-1">
         <div className="flex items-center">
-          <span className="text-gray-700 dark:text-gray-300 font-medium mr-1">{title}</span>
+          <span className="text-gray-700 dark:text-gray-300 text-xs font-medium mr-1">{title}</span>
           {description && (
             <div className="inline-block cursor-help group relative">
                 <svg className="w-4 h-4 fill-current text-gray-400 dark:text-gray-500" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                     <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z"></path>
                 </svg>
-                <span className="absolute left-0 -top-2 ml-6 w-64 p-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10 dark:bg-gray-100 dark:text-gray-800 shadow-lg">
+                <span 
+                  className="absolute left-0 -top-2 ml-6 w-64 p-2 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-10 dark:bg-gray-100 dark:text-gray-800 shadow-lg"
+                  style={{ fontSize: '10px' }}
+                >
                     {description}
                 </span>
             </div>
           )}
         </div>
-        <span className="text-gray-700 dark:text-gray-300 font-medium">{score}%</span>
+        <span className="text-gray-700 dark:text-gray-300 text-xs font-medium">{score}%</span>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
         <div 
