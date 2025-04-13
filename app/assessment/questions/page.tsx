@@ -36,6 +36,10 @@ export default function AssessmentQuestions() {
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const currentQuestion = useMemo(() => allQuestions[currentIndex], [allQuestions, currentIndex]); // Memoize current question
+  // Get the current category object based on the current question
+  const currentCategory = useMemo(() => {
+      return categories.find(cat => cat.questions.some(q => q.id === currentQuestion?.id));
+  }, [categories, currentQuestion]);
 
   // Compute starting index for each category
   const categoryStarts = useMemo<Record<string, number>>(() => {
@@ -184,9 +188,9 @@ export default function AssessmentQuestions() {
             </div>
           </div>
 
-          {/* Category Navigation */}
+          {/* Category Navigation and Description */}
           {allQuestions.length > 0 && (
-            <div className="max-w-xl mx-auto w-full">
+            <div className="max-w-xl mx-auto w-full mb-6"> {/* Added margin-bottom */}
               {/* Mobile Dropdown Navigation */}
               <div className="block sm:hidden mb-4">
                 <select
@@ -232,6 +236,15 @@ export default function AssessmentQuestions() {
                   ))}
                 </div>
               </div>
+
+              {/* Display Current Category Description */} 
+              {currentCategory && currentCategory.categoryDescription_en && (
+                <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {currentCategory.categoryDescription_en}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
