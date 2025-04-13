@@ -43,31 +43,37 @@ const styles = StyleSheet.create({
   metricsContainer: {
     marginVertical: 10,
   },
+  metricItemContainer: {
+    marginBottom: 12,
+  },
   metricRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 4,
+    marginBottom: 4,
   },
   metricLabel: {
-    flex: 1,
     fontSize: 12,
     color: '#4B5563',
   },
   metricValue: {
     fontSize: 12,
     color: '#1F2937',
-    marginLeft: 10,
   },
   metricBar: {
     height: 6,
     backgroundColor: '#F3F4F6',
     borderRadius: 3,
-    marginTop: 4,
   },
   metricFill: {
     height: '100%',
     backgroundColor: '#F97316',
     borderRadius: 3,
+  },
+  metricDescription: {
+    fontSize: 10,
+    color: '#6B7280',
+    marginTop: 4,
   },
   providerSection: {
     marginTop: 20,
@@ -249,7 +255,8 @@ const RadarChartPDF = ({ data }: { data: { category: string; value: number }[] }
 
 interface Metric {
   category: string;
-  value: number;
+  score: number;
+  description?: string;
 }
 
 interface Provider {
@@ -278,7 +285,7 @@ interface AssessmentReportProps {
 export const AssessmentReport = ({ metrics, overallScore, providers, userInfo }: AssessmentReportProps) => {
   const radarData = metrics.map(m => ({
     category: m.category,
-    value: m.value
+    value: m.score
   }));
 
   return (
@@ -317,17 +324,24 @@ export const AssessmentReport = ({ metrics, overallScore, providers, userInfo }:
           </View>
         </View>
 
-        {/* Detailed Metrics */}
+        {/* Detailed Metrics - Updated Structure */}
         <View style={[styles.section, { marginTop: 0 }]}>
           <Text style={styles.subtitle}>Detailed Metrics</Text>
           <View style={styles.metricsContainer}>
             {metrics.map((metric, index) => (
-              <View key={index} style={styles.metricRow}>
-                <Text style={styles.metricLabel}>{metric.category}</Text>
-                <Text style={styles.metricValue}>{metric.value}%</Text>
-                <View style={styles.metricBar}>
-                  <View style={[styles.metricFill, { width: `${metric.value}%` }]} />
+              <View key={index} style={styles.metricItemContainer}>
+                <View style={styles.metricRow}>
+                  <Text style={styles.metricLabel}>{metric.category}</Text>
+                  <Text style={styles.metricValue}>{metric.score}%</Text>
                 </View>
+                <View style={styles.metricBar}>
+                  <View style={[styles.metricFill, { width: `${metric.score}%` }]} />
+                </View>
+                {metric.description && (
+                  <Text style={styles.metricDescription}>
+                    {metric.description}
+                  </Text>
+                )}
               </View>
             ))}
           </View>
@@ -372,7 +386,12 @@ export const AssessmentReport = ({ metrics, overallScore, providers, userInfo }:
   );
 };
 
-export const downloadReport = async ({ metrics, overallScore, providers, userInfo }: { metrics: any; overallScore: any; providers: any; userInfo: any; }) => {
+export const downloadReport = async ({ metrics, overallScore, providers, userInfo }: {
+  metrics: Metric[];
+  overallScore: any;
+  providers: any;
+  userInfo: any;
+}) => {
   console.log('Generating PDF report with userInfo:', userInfo);
   const report = (
     <AssessmentReport

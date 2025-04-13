@@ -10,7 +10,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 // Define types for metrics and providers (should match types in results page and generate-report)
 interface Metric {
   category: string;
-  value: number;
+  score: number;
+  description: string;
 }
 
 interface Provider {
@@ -55,19 +56,26 @@ function ContactContent() {
       
       setResponseId(storedResponseId); // Set responseId state
 
-      const parsedMetrics = JSON.parse(storedMetricsString);
+      const parsedMetricsData = JSON.parse(storedMetricsString);
       const parsedProviders = JSON.parse(storedProvidersString);
 
-      // Convert metrics object back to array format expected by report generator
-      const metricsArray = Object.entries(parsedMetrics).map(([category, value]) => ({ category, value: value as number }));
+      // Convert metrics object { category: { score, description } } 
+      // back to array format { category, score, description } expected by report generator
+      const metricsArray: Metric[] = Object.entries(parsedMetricsData).map(([category, result]) => ({
+          category,
+          score: (result as { score: number }).score, // Extract score
+          description: (result as { description: string }).description // Extract description
+      }));
 
       setMetrics(metricsArray);
       setProviders(parsedProviders);
 
-      // Calculate overallScore
-      const score = Math.round(
-        metricsArray.reduce((sum, metric) => sum + metric.value, 0) / metricsArray.length
-      );
+      // Calculate overallScore from the array format
+      const score = metricsArray.length > 0 
+        ? Math.round(
+            metricsArray.reduce((sum, metric) => sum + metric.score, 0) / metricsArray.length
+          )
+        : 0;
       setOverallScore(score);
 
     } catch (err: any) {
@@ -198,10 +206,13 @@ function ContactContent() {
   };
 
   // Internal function to initiate download (now receives data as args)
-  const handleDownload = async (userInfo: any, metricsData: Metric[], score: number, providersData: Provider[]) => {
+  const handleDownload = async (userInfo: any, metricsData: Metric[] | null, score: number, providersData: Provider[] | null) => {
+    if (!metricsData || !providersData) {
+        alert('Report data is missing. Cannot generate report.');
+        return;
+    }
     console.log('Initiating download with userInfo:', userInfo);
     try {
-      // Use the passed data, not the old mock data
       await downloadReport({ metrics: metricsData, overallScore: score, providers: providersData, userInfo });
     } catch (error) {
       console.error('Download error:', error);
@@ -210,16 +221,13 @@ function ContactContent() {
   };
 
   // Internal function to handle email logic (now receives data as args)
-  const handleEmail = (email: string, metricsData: Metric[], score: number, providersData: Provider[]) => {
-    // Here you would typically send the report via email
-    // This would likely involve calling an API endpoint
+  const handleEmail = (email: string, metricsData: Metric[] | null, score: number, providersData: Provider[] | null) => {
+    if (!metricsData || !providersData) {
+        alert('Report data is missing. Cannot send email.');
+        return;
+    }
     console.log('Sending report data to:', email, { metricsData, score, providersData });
-    // Placeholder alert
     alert('Report sent to your email (simulation)');
-    // Consider clearing localStorage or redirecting after sending
-    // localStorage.removeItem('reportMetrics');
-    // localStorage.removeItem('reportProviders');
-    // router.push('/thank-you'); // Example redirect
   };
 
   // Render loading state
