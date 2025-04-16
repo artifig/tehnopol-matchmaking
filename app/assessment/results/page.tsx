@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Modal from '@/components/utils/modal';
-import { ResponsiveContainer, RadarChart as RechartsRadarChart, PolarGrid, PolarAngleAxis, Radar, Tooltip } from 'recharts';
+import { ResponsiveContainer, RadarChart as RechartsRadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip } from 'recharts';
 import { useRouter } from "next/navigation";
 
 interface Provider {
@@ -314,6 +314,7 @@ function RadarChart({ metrics }: { metrics: Metrics }) {
         <RechartsRadarChart data={data} outerRadius="90%" margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>
           <PolarGrid gridType="circle" />
           <PolarAngleAxis dataKey="category" tick={renderCustomTick} />
+          <PolarRadiusAxis angle={90} domain={[0, 100]} axisLine={false} tick={false} />
           <Radar
             name="Performance"
             dataKey="value"
